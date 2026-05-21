@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.1.4 (Fixed Navigation)</title>
+    <title>ส.ดพ.บางบอน V3.1.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +42,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.4</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.5</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded"></div>
@@ -56,7 +56,7 @@
     
     <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">เลือกประเภทงานเพื่อบันทึก</p>
     <div class="grid grid-cols-1 gap-3">
-        <button onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition">
+        <button type="button" onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition w-full">
             <div class="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-fire"></i></div>
             <div>
                 <h3 class="font-bold text-white text-base">รายงานเหตุเพลิงไหม้</h3>
@@ -64,7 +64,7 @@
             </div>
         </button>
         
-        <button onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition">
+        <button type="button" onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition w-full">
             <div class="w-12 h-12 rounded-lg bg-yellow-600/20 flex items-center justify-center text-yellow-500 text-xl"><i class="fa-solid fa-snake"></i></div>
             <div>
                 <h3 class="font-bold text-white text-base">ช่วยเหลือประชาชน / 501</h3>
@@ -92,7 +92,7 @@
             <div class="grid grid-cols-3 gap-2 mt-1">
                 <select id="fire_car1"><option value="">-- รถ 1 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
                 <select id="fire_car2"><option value="">-- รถ 2 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางbอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
+                <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
             </div>
         </div>
 
@@ -109,15 +109,15 @@
         
         <div>
             <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
-            <div class="staff-selector"><div id="fire_team_list"></div></div>
+            <div class="staff-selector"><div id="fire_team_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
         
         <div>
             <label>📢 ผู้รายงานเหตุ</label>
-            <div class="staff-selector"><div id="fire_sender_list"></div></div>
+            <div class="staff-selector"><div id="fire_sender_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
         
-        <button class="w-full bg-red-600 text-white p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition" onclick="prepareReport('fire')">
+        <button type="button" class="w-full bg-red-600 text-white p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition" onclick="prepareReport('fire')">
             <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานเพลิงไหม้
         </button>
     </div>
@@ -181,15 +181,15 @@
 
         <div>
             <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
-            <div class="staff-selector"><div id="res_team_list"></div></div>
+            <div class="staff-selector"><div id="res_team_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
 
         <div>
             <label>📢 ผู้รายงานเหตุ</label>
-            <div class="staff-selector"><div id="res_sender_list"></div></div>
+            <div class="staff-selector"><div id="res_sender_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
 
-        <button class="w-full bg-amber-500 text-black p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition" onclick="prepareReport('rescue')">
+        <button type="button" class="w-full bg-amber-500 text-black p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition" onclick="prepareReport('rescue')">
             <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานการช่วยเหลือ
         </button>
     </div>
@@ -217,8 +217,8 @@
         </h3>
         <div id="previewBody" class="modal-body"></div>
         <div class="flex gap-3">
-            <button class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white" onclick="closePreview()">กลับไปแก้ไข</button>
-            <button id="btnConfirmSend" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold text-sm text-white shadow-md">ยืนยันส่งข้อมูล</button>
+            <button type="button" class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white" onclick="closePreview()">กลับไปแก้ไข</button>
+            <button type="button" id="btnConfirmSend" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold text-sm text-white shadow-md">ยืนยันส่งข้อมูล</button>
         </div>
     </div>
 </div>
@@ -233,45 +233,59 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-        document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
-        document.getElementById('tab-' + tabId).classList.add('active');
-        document.getElementById('nav-' + tabId).classList.add('active');
+        const contents = document.querySelectorAll('.tab-content');
+        const navs = document.querySelectorAll('.nav-item');
+        
+        for (let i = 0; i < contents.length; i++) {
+            contents[i].classList.remove('active');
+        }
+        for (let j = 0; j < navs.length; j++) {
+            navs[j].classList.remove('active');
+        }
+        
+        const targetTab = document.getElementById('tab-' + tabId);
+        const targetNav = document.getElementById('nav-' + tabId);
+        
+        if (targetTab) targetTab.classList.add('active');
+        if (targetNav) targetNav.classList.add('active');
+        
         window.scrollTo(0, 0);
     }
 
     function updateLivePreview(inputId, outputId) {
         const val = document.getElementById(inputId).value;
         const out = document.getElementById(outputId);
-        if (val) {
-            out.innerText = "ตรวจสอบ: " + val;
-            out.style.borderColor = "#00ff41";
-        } else {
-            out.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
-            out.style.borderColor = "#444";
+        if (out) {
+            if (val) {
+                out.innerText = "ตรวจสอบ: " + val;
+                out.style.borderColor = "#00ff41";
+            } else {
+                out.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
+                out.style.borderColor = "#444";
+            }
         }
     }
 
     function generateStaff() {
-        const containers = {
-            fTeam: document.getElementById('fire_team_list'),
-            fSend: document.getElementById('fire_sender_list'),
-            rTeam: document.getElementById('res_team_list'),
-            rSend: document.getElementById('res_sender_list')
-        };
-        let htmlBase = '';
+        let htmlTeam = '';
+        let htmlSend = '';
+        
         for (let g = 1; g <= 4; g++) {
-            htmlBase += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
             for (let i = 1; i <= 10; i++) {
                 const name = 'บางบอน ' + g + '-' + i;
-                htmlBase += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
+                htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
+                htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
             }
-            htmlBase += '</div>';
+            htmlTeam += '</div>';
+            htmlSend += '</div>';
         }
-        containers.fTeam.innerHTML = htmlBase;
-        containers.rTeam.innerHTML = htmlBase;
-        containers.fSend.innerHTML = htmlBase.replace(/type="checkbox" class="st-chk"/g, 'type="radio" name="f_sender"');
-        containers.rSend.innerHTML = htmlBase.replace(/type="checkbox" class="st-chk"/g, 'type="radio" name="r_sender"');
+        
+        document.getElementById('fire_team_list').innerHTML = htmlTeam;
+        document.getElementById('res_team_list').innerHTML = htmlTeam;
+        document.getElementById('fire_sender_list').innerHTML = htmlSend;
+        document.getElementById('res_sender_list').innerHTML = htmlSend;
     }
 
     function getThaiDate() {
@@ -284,12 +298,14 @@
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
         const otherLp = document.getElementById('lp_res_type');
-        if (s.value === 'เหตุอื่นๆ') {
-            otherInput.style.display = 'block';
-            otherLp.style.display = 'block';
-        } else {
-            otherInput.style.display = 'none';
-            otherLp.style.display = 'none';
+        if (s && otherInput && otherLp) {
+            if (s.value === 'เหตุอื่นๆ') {
+                otherInput.style.display = 'block';
+                otherLp.style.display = 'block';
+            } else {
+                otherInput.style.display = 'none';
+                otherLp.style.display = 'none';
+            }
         }
     }
 
@@ -304,7 +320,7 @@
             const place = document.getElementById('fire_place').value || '-';
             const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(function(v) { return v; }).join(', ') || '-';
             const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
-            const sender = (document.querySelector('input[name="f_sender"]:checked') || {value: '-'}).value;
+            const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
             const t = {
                 1: document.getElementById('f_t1').value || '-',
                 2: document.getElementById('f_t2').value || '-',
@@ -322,7 +338,7 @@
             const size = document.getElementById('res_len_text').value || '-';
             const car = document.getElementById('res_car_single').value || '-';
             const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
-            const sender = (document.querySelector('input[name="r_sender"]:checked') || {value: '-'}).value;
+            const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
             const t = {
                 1: document.getElementById('r_t1').value || '-',
                 2: document.getElementById('r_t2').value || '-',
@@ -378,10 +394,11 @@
         }
     }
 
-    window.onload = function() {
+    // เรียกฟังก์ชันเมื่อ DOM พร้อมทำงานเต็มที่ ป้องกันอาการปุ่มค้าง
+    document.addEventListener("DOMContentLoaded", function() {
         generateStaff();
         document.getElementById('current-date').innerText = getThaiDate();
-    };
+    });
 </script>
 </body>
 </html>
