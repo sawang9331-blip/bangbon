@@ -238,7 +238,7 @@
 </div>
 
 <script>
-    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+    const SUPABASE_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co";
     const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -264,23 +264,22 @@
     }
 
     function generateStaff() {
-        const containers = {
-            fTeam: document.getElementById('fire_team_list'),
-            fSend: document.getElementById('fire_sender_list'),
-            rTeam: document.getElementById('res_team_list'),
-            rSend: document.getElementById('res_sender_list')
-        };
-        
-        let htmlBase = '';
-        for (let g = 1; g <= 4; g++) {
-            htmlBase += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
-            for (let i = 1; i <= 10; i++) {
-                const name = `บางบอน ${g}-${i}`;
-                htmlBase += `<label class="staff-item"><input type="checkbox" class="st-chk" value="${name}"> ${name}</label>`;
-            }
-            htmlBase += `</div>`;
+    const containers = {
+        fTeam: document.getElementById('fire_team_list'),
+        fSend: document.getElementById('fire_sender_list'),
+        rTeam: document.getElementById('res_team_list'),
+        rSend: document.getElementById('res_sender_list')
+    };
+    let htmlBase = '';
+    for (let g = 1; g <= 4; g++) {
+        htmlBase += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
+        for (let i = 1; i <= 10; i++) {
+            const name = `บางบอน ${g}-${i}`;
+            htmlBase += `<label class="staff-item"><input type="checkbox" class="st-chk" value="${name}"> ${name}</label>`;
         }
-
+        htmlBase += `</div>`;
+    }
+        
         containers.fTeam.innerHTML = htmlBase;
         containers.rTeam.innerHTML = htmlBase;
         containers.fSend.innerHTML = htmlBase.replace(/type="checkbox" class="st-chk"/g, 'type="radio" name="f_sender"');
