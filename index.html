@@ -43,21 +43,67 @@
 </div>
 
 <div id="tab-home" class="tab-content active">
+    <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 rounded-2xl mb-4 border border-zinc-700 text-center shadow-lg">
+        <p class="text-zinc-400 text-sm">ระบบบันทึกรายงานการปฎิบัติงาน</p>
+        <h2 class="text-xl font-bold mt-1 text-white">ส.ดพ.บางบอน</h2>
     </div>
+    <div class="grid grid-cols-1 gap-3">
+        <button type="button" onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
+            <div class="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-fire"></i></div>
+            <div><h3 class="font-bold text-white text-base">รายงานเหตุเพลิงไหม้</h3></div>
+        </button>
+        <button type="button" onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
+            <div class="w-12 h-12 rounded-lg bg-yellow-600/20 flex items-center justify-center text-yellow-500 text-xl"><i class="fa-solid fa-snake"></i></div>
+            <div><h3 class="font-bold text-white text-base">ช่วยเหลือประชาชน</h3></div>
+        </button>
+    </div>
+</div>
 
 <div id="tab-fire" class="tab-content">
-    </div>
+    <h2 class="text-lg font-bold text-white mb-4">บันทึกเหตุเพลิงไหม้</h2>
+    <input type="text" id="fire_place" placeholder="สถานที่เกิดเหตุ" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-700 rounded-xl text-white">
+    <button onclick="prepareReport('fire')" class="w-full bg-red-600 p-4 rounded-xl font-bold">ตรวจสอบรายงาน</button>
+</div>
 
 <div id="tab-rescue" class="tab-content">
+    <h2 class="text-lg font-bold text-white mb-4">ช่วยเหลือประชาชน</h2>
+    <input type="text" id="res_place" placeholder="สถานที่เกิดเหตุ" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-700 rounded-xl text-white">
+    <button onclick="prepareReport('rescue')" class="w-full bg-amber-600 p-4 rounded-xl font-bold">ตรวจสอบรายงาน</button>
+</div>
+
+<div class="nav-bar">
+    <div id="nav-home" class="nav-item active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span>หน้าแรก</span></div>
+    <div id="nav-fire" class="nav-item" onclick="switchTab('fire')"><i class="fa-solid fa-fire"></i><span>เพลิงไหม้</span></div>
+    <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')"><i class="fa-solid fa-handshake"></i><span>ช่วยเหลือ</span></div>
+</div>
+
+<div id="previewOverlay" class="overlay">
+    <div class="modal-container">
+        <h3 class="text-white font-bold mb-2">ตรวจสอบรายงาน</h3>
+        <div id="previewBody" class="modal-body"></div>
+        <button onclick="closePreview()" class="w-full bg-zinc-700 p-3 rounded-xl text-white">ปิด</button>
     </div>
+</div>
 
 <script>
-    // ดึงฟังก์ชันดั้งเดิมของพี่กลับมาทั้งหมด
-    function switchTab(id) { /* ... */ }
-    function prepareReport(type) { /* ... */ }
-    function generateStaff() { /* ... */ }
-    function sendFinal() { /* ... */ }
-    // ... และฟังก์ชันอื่นๆ ที่เคยอยู่ในไฟล์เดิม
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('tab-' + tabId).style.display = 'block';
+        document.getElementById('nav-' + tabId)?.classList.add('active');
+    }
+    
+    function prepareReport(type) {
+        const place = document.getElementById(type === 'fire' ? 'fire_place' : 'res_place').value;
+        document.getElementById('previewBody').innerText = "ประเภท: " + type + "\nสถานที่: " + place;
+        document.getElementById('previewOverlay').style.display = 'flex';
+    }
+
+    function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
+
+    window.onload = function() {
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('th-TH');
+    }
 </script>
 </body>
 </html>
