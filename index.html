@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.1.1 (Fixed Navigation)</title>
+    <title>ส.ดพ.บางบอน V3.0.0 (Fixed Navigation)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +42,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.2</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.0.0</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded"></div>
@@ -90,9 +90,9 @@
         <div>
             <label>🚒 รถที่ออกเหตุ (เลือกตามลำดับ)</label>
             <div class="grid grid-cols-3 gap-2 mt-1">
-                <select id="fire_car1"><option value="">-- รถ 1 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 062-1">062-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                <select id="fire_car2"><option value="">-- รถ 2 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 062-1">062-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 062-1">062-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
+                <select id="fire_car1"><option value="">-- รถ 1 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
+                <select id="fire_car2"><option value="">-- รถ 2 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
+                <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
             </div>
         </div>
 
@@ -159,8 +159,8 @@
             <select id="res_car_single">
                 <option value="">-- เลือกคันรถ --</option>
                 <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
-                <option value="รถบางบอน 062-1">รถบางบอน 062-1</option>
                 <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
+                <option value="รถบางบอน 046-1">รถบางบอน 062-1</option>
                 <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
                 <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
                 <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
@@ -235,7 +235,6 @@
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        
         document.getElementById(`tab-${tabId}`).classList.add('active');
         document.getElementById(`nav-${tabId}`).classList.add('active');
         window.scrollTo(0, 0);
@@ -269,7 +268,6 @@
             }
             htmlBase += `</div>`;
         }
-        
         containers.fTeam.innerHTML = htmlBase;
         containers.rTeam.innerHTML = htmlBase;
         containers.fSend.innerHTML = htmlBase.replace(/type="checkbox" class="st-chk"/g, 'type="radio" name="f_sender"');
@@ -286,7 +284,6 @@
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
         const otherLp = document.getElementById('lp_res_type');
-        
         if(s.value === 'เหตุอื่นๆ') {
             otherInput.style.display = 'block';
             otherLp.style.display = 'block';
