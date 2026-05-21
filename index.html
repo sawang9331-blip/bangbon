@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.0.0 (Fixed Navigation)</title>
+    <title>ส.ดพ.บางบอน V3.1.2 (Fixed Navigation)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,7 +42,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.0.0</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.2</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded"></div>
@@ -230,7 +230,7 @@
 <script>
     const SUPABASE_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -243,7 +243,7 @@
     function updateLivePreview(inputId, outputId) {
         const val = document.getElementById(inputId).value;
         const out = document.getElementById(outputId);
-        if(val) {
+        if (val) {
             out.innerText = "ตรวจสอบ: " + val;
             out.style.borderColor = "#00ff41";
         } else {
@@ -284,7 +284,7 @@
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
         const otherLp = document.getElementById('lp_res_type');
-        if(s.value === 'เหตุอื่นๆ') {
+        if (s.value === 'เหตุอื่นๆ') {
             otherInput.style.display = 'block';
             otherLp.style.display = 'block';
         } else {
@@ -311,7 +311,7 @@
             json = { type: "เพลิงไหม้", date: dateStr, place: place, len: "-", staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: cars };
         } else {
             let animal = document.getElementById('res_type_text').value;
-            if(animal === 'เหตุอื่นๆ') animal = document.getElementById('res_type_other').value || 'เหตุอื่นๆ';
+            if (animal === 'เหตุอื่นๆ') animal = document.getElementById('res_type_other').value || 'เหตุอื่นๆ';
             const place = document.getElementById('res_place').value || '-';
             const size = document.getElementById('res_len_text').value || '-';
             const car = document.getElementById('res_car_single').value || '-';
@@ -336,9 +336,8 @@
         const btn = document.getElementById('btnConfirmSend');
         btn.disabled = true;
         btn.innerText = "กำลังบันทึก...";
-
         const { text, json } = pendingData;
-        
+
         try {
             await navigator.clipboard.writeText(text);
         } catch (e) {
@@ -349,16 +348,11 @@
         }
 
         try {
-            const { data, error } = await supabase
-                .from('incident_reports')
-                .insert([json]);
-
+            const { data, error } = await supabase.from('incident_reports').insert([json]);
             if (error) throw error;
-            
             const hint = document.getElementById('copyHint');
             hint.classList.remove('hidden');
             setTimeout(() => { hint.classList.add('hidden'); }, 3000);
-            
             btn.innerText = "ส่งสำเร็จแล้ว ✅";
             closePreview();
             switchTab('home');
