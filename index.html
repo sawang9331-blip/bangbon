@@ -228,28 +228,41 @@
 </div>
 
 <script>
+    // ห่อหุ้มโค้ดในรูปแบบ Safe Initialization เพื่อไม่ให้ข้อผิดพลาดของ Supabase ไปขัดขวางปุ่มกดหลัก
     const SUPABASE_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabase = null;
+
+    try {
+        if (window.supabase && typeof window.supabase.createClient === "function") {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    } catch(e) {
+        console.error("Supabase init error:", e);
+    }
 
     function switchTab(tabId) {
-        const contents = document.querySelectorAll('.tab-content');
-        const navs = document.querySelectorAll('.nav-item');
-        
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].classList.remove('active');
+        try {
+            const contents = document.querySelectorAll('.tab-content');
+            const navs = document.querySelectorAll('.nav-item');
+            
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove('active');
+            }
+            for (let j = 0; j < navs.length; j++) {
+                navs[j].classList.remove('active');
+            }
+            
+            const targetTab = document.getElementById('tab-' + tabId);
+            const targetNav = document.getElementById('nav-' + tabId);
+            
+            if (targetTab) targetTab.classList.add('active');
+            if (targetNav) targetNav.classList.add('active');
+            
+            window.scrollTo(0, 0);
+        } catch(err) {
+            console.error("switchTab error:", err);
         }
-        for (let j = 0; j < navs.length; j++) {
-            navs[j].classList.remove('active');
-        }
-        
-        const targetTab = document.getElementById('tab-' + tabId);
-        const targetNav = document.getElementById('nav-' + tabId);
-        
-        if (targetTab) targetTab.classList.add('active');
-        if (targetNav) targetNav.classList.add('active');
-        
-        window.scrollTo(0, 0);
     }
 
     function updateLivePreview(inputId, outputId) {
@@ -376,6 +389,16 @@
             document.body.removeChild(el);
         }
 
+        // เช็คก่อนส่งว่าฐานข้อมูลพร้อมทำงานไหม
+        if (!supabase) {
+            alert("⚠️ ระบบบันทึกเข้าฐานข้อมูลขัดข้อง (Supabase ไม่พร้อมทำงาน) แต่ระบบได้ทำการ 'คัดลอกข้อความรายงาน' ลงในมือถือของพี่เรียบร้อยแล้ว สามารถนำไปวางส่งในไลน์ได้เลยครับ!");
+            btn.disabled = false;
+            btn.innerText = "ยืนยันส่งข้อมูล";
+            closePreview();
+            switchTab('home');
+            return;
+        }
+
         try {
             const result = await supabase.from('incident_reports').insert([json]);
             if (result.error) throw result.error;
@@ -387,17 +410,17 @@
             switchTab('home');
         } catch (err) {
             console.error(err);
-            alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + err.message);
+            alert("❌ บันทึกลงฐานข้อมูลไม่สำเร็จ แต่คัดลอกข้อความลงคลิปบอร์ดแล้ว: " + err.message);
         } finally {
             btn.disabled = false;
             btn.innerText = "ยืนยันส่งข้อมูล";
         }
     }
 
-    // เรียกฟังก์ชันเมื่อ DOM พร้อมทำงานเต็มที่ ป้องกันอาการปุ่มค้าง
     document.addEventListener("DOMContentLoaded", function() {
         generateStaff();
-        document.getElementById('current-date').innerText = getThaiDate();
+        const dateEl = document.getElementById('current-date');
+        if(dateEl) dateEl.innerText = getThaiDate();
     });
 </script>
 </body>
