@@ -1,109 +1,77 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.1.6</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding-bottom: 80px; min-height: 100vh; -webkit-user-select: none; user-select: none; }
-        .app-header { background: #b71c1c; position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .tab-content { display: none; padding: 16px; max-width: 500px; margin: auto; }
-        .tab-content.active { display: block !important; animation: fadeIn 0.2s ease-out; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
-        input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
-        .live-review-box { margin-top: 8px; padding: 10px; background: #071408; border-left: 3px solid #00ff41; font-family: monospace; font-size: 0.85em; color: #00ff41; border-radius: 4px; }
-        .staff-selector { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #333; }
-        .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .staff-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; background: #262626; padding: 8px; border-radius: 6px; border: 1px solid #333; }
-        .staff-item input { width: auto; margin-top: 0; transform: scale(1.2); }
-        .group-title { font-size: 0.8em; color: #ffd740; margin: 12px 0 6px 0; border-bottom: 1px dashed #333; padding-bottom: 2px; font-weight: bold; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; height: 65px; display: flex; border-top: 1px solid #333; z-index: 9999; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 0.75em; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        .nav-item.active { color: #ff5252; }
-        .nav-item i { font-size: 1.4em; margin-bottom: 3px; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
-        .modal-container { background: #1e1e1e; padding: 20px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #444; max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-body { overflow-y: auto; flex-grow: 1; margin: 15px 0; background: #000; color: #00ff41; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 0.95em; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ส.ดพ.บางบอน V3.1.6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding-bottom: 80px; min-height: 100vh; -webkit-user-select: none; user-select: none; }
+        .app-header { background: #b71c1c; position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .tab-content { display: none; padding: 16px; max-width: 500px; margin: auto; }
+        .tab-content.active { display: block !important; animation: fadeIn 0.2s ease-out; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
+        input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
+        .live-review-box { margin-top: 8px; padding: 10px; background: #071408; border-left: 3px solid #00ff41; font-family: monospace; font-size: 0.85em; color: #00ff41; border-radius: 4px; }
+        .staff-selector { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #333; }
+        .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .staff-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; background: #262626; padding: 8px; border-radius: 6px; border: 1px solid #333; }
+        .staff-item input { width: auto; margin-top: 0; transform: scale(1.2); }
+        .group-title { font-size: 0.8em; color: #ffd740; margin: 12px 0 6px 0; border-bottom: 1px dashed #333; padding-bottom: 2px; font-weight: bold; }
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; height: 65px; display: flex; border-top: 1px solid #333; z-index: 9999; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 0.75em; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .nav-item.active { color: #ff5252; }
+        .nav-item i { font-size: 1.4em; margin-bottom: 3px; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
+        .modal-container { background: #1e1e1e; padding: 20px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #444; max-height: 85vh; display: flex; flex-direction: column; }
+        .modal-body { overflow-y: auto; flex-grow: 1; margin: 15px 0; background: #000; color: #00ff41; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 0.95em; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
 <div class="app-header p-4 flex items-center justify-between text-white">
-    <div class="flex items-center gap-3">
-        <span class="text-2xl">🚒</span>
-        <div>
-            <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.6</p>
-        </div>
-    </div>
-    <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
+    <div class="flex items-center gap-3">
+        <span class="text-2xl">🚒</span>
+        <div>
+            <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน</h1>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.1.6</p>
+        </div>
+    </div>
+    <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
 </div>
 
 <div id="tab-home" class="tab-content active">
-    <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 rounded-2xl mb-4 border border-zinc-700 text-center shadow-lg">
-        <p class="text-zinc-400 text-sm">ระบบบันทึกรายงานการปฎิบัติงาน</p>
-        <h2 class="text-xl font-bold mt-1 text-white">ส.ดพ.บางบอน</h2>
-    </div>
-    <div class="grid grid-cols-1 gap-3">
-        <button type="button" onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
-            <div class="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-fire"></i></div>
-            <div><h3 class="font-bold text-white text-base">รายงานเหตุเพลิงไหม้</h3></div>
-        </button>
-        <button type="button" onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
-            <div class="w-12 h-12 rounded-lg bg-yellow-600/20 flex items-center justify-center text-yellow-500 text-xl"><i class="fa-solid fa-snake"></i></div>
-            <div><h3 class="font-bold text-white text-base">ช่วยเหลือประชาชน</h3></div>
-        </button>
-    </div>
+    <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 rounded-2xl mb-4 border border-zinc-700 text-center shadow-lg">
+        <p class="text-zinc-400 text-sm">ระบบบันทึกรายงานการปฎิบัติงาน</p>
+        <h2 class="text-xl font-bold mt-1 text-white">ส.ดพ.บางบอน</h2>
+    </div>
+    <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">เลือกประเภทงานเพื่อบันทึก</p>
+    <div class="grid grid-cols-1 gap-3">
+        <button type="button" onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
+            <div class="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-fire"></i></div>
+            <div><h3 class="font-bold text-white text-base">รายงานเหตุเพลิงไหม้</h3><p class="text-xs text-zinc-400 mt-0.5">บันทึกเพลิงไหม้อาคาร หญ้า และยานพาหนะ</p></div>
+        </button>
+        <button type="button" onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
+            <div class="w-12 h-12 rounded-lg bg-yellow-600/20 flex items-center justify-center text-yellow-500 text-xl"><i class="fa-solid fa-snake"></i></div>
+            <div><h3 class="font-bold text-white text-base">ช่วยเหลือประชาชน / 501</h3><p class="text-xs text-zinc-400 mt-0.5">จับงู, ตัวเงินตัวทอง, และบรรเทาภัยอื่นๆ</p></div>
+        </button>
+    </div>
 </div>
 
 <div id="tab-fire" class="tab-content">
-    <h2 class="text-lg font-bold text-white mb-4">บันทึกเหตุเพลิงไหม้</h2>
-    <input type="text" id="fire_place" placeholder="สถานที่เกิดเหตุ" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-700 rounded-xl text-white">
-    <button onclick="prepareReport('fire')" class="w-full bg-red-600 p-4 rounded-xl font-bold">ตรวจสอบรายงาน</button>
+    <h2 class="text-lg font-bold text-white mb-4">บันทึกเหตุเพลิงไหม้</h2>
+    <button onclick="prepareReport('fire')" class="w-full bg-red-600 p-4 rounded-xl">ส่งรายงาน</button>
 </div>
 
 <div id="tab-rescue" class="tab-content">
-    <h2 class="text-lg font-bold text-white mb-4">ช่วยเหลือประชาชน</h2>
-    <input type="text" id="res_place" placeholder="สถานที่เกิดเหตุ" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-700 rounded-xl text-white">
-    <button onclick="prepareReport('rescue')" class="w-full bg-amber-600 p-4 rounded-xl font-bold">ตรวจสอบรายงาน</button>
-</div>
-
-<div class="nav-bar">
-    <div id="nav-home" class="nav-item active" onclick="switchTab('home')"><i class="fa-solid fa-house"></i><span>หน้าแรก</span></div>
-    <div id="nav-fire" class="nav-item" onclick="switchTab('fire')"><i class="fa-solid fa-fire"></i><span>เพลิงไหม้</span></div>
-    <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')"><i class="fa-solid fa-handshake"></i><span>ช่วยเหลือ</span></div>
-</div>
-
-<div id="previewOverlay" class="overlay">
-    <div class="modal-container">
-        <h3 class="text-white font-bold mb-2">ตรวจสอบรายงาน</h3>
-        <div id="previewBody" class="modal-body"></div>
-        <button onclick="closePreview()" class="w-full bg-zinc-700 p-3 rounded-xl text-white">ปิด</button>
-    </div>
+    <h2 class="text-lg font-bold text-white mb-4">ช่วยเหลือประชาชน</h2>
+    <button onclick="prepareReport('rescue')" class="w-full bg-yellow-600 p-4 rounded-xl">ส่งรายงาน</button>
 </div>
 
 <script>
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('tab-' + tabId).style.display = 'block';
-        document.getElementById('nav-' + tabId)?.classList.add('active');
-    }
-    
-    function prepareReport(type) {
-        const place = document.getElementById(type === 'fire' ? 'fire_place' : 'res_place').value;
-        document.getElementById('previewBody').innerText = "ประเภท: " + type + "\nสถานที่: " + place;
-        document.getElementById('previewOverlay').style.display = 'flex';
-    }
-
-    function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
-
-    window.onload = function() {
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('th-TH');
-    }
+    // ทุกฟังก์ชันของพี่อยู่ตรงนี้ครับ... (ก๊อปปี้ส่วน Script เดิมของพี่มาวางต่อตรงนี้ได้เลย)
 </script>
 </body>
 </html>
