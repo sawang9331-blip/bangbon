@@ -1,5 +1,5 @@
 body {
-    background-image: url('ชื่อไฟล์ภาพของคุณ.jpg'); /* หรือใส่ URL ของภาพ */
+    background-image: url('file:///C:/Users/moning%20sun/OneDrive/%E0%B9%80%E0%B8%94%E0%B8%AA%E0%B8%81%E0%B9%8C%E0%B8%97%E0%B9%87%E0%B8%AD%E0%B8%9B/%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B8%9A%E0%B8%AD%E0%B8%99.png.jpg'); /* หรือใส่ URL ของภาพ */
     background-size: cover;                        /* ปรับภาพให้พอดีเต็มหน้าจอ */
     background-position: center;                  /* จัดวางภาพให้อยู่ตรงกลาง */
     background-repeat: no-repeat;                 /* ไม่ให้ภาพซ้ำซ้อนกัน */
