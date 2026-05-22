@@ -1,5 +1,5 @@
 body {
-    background-image: url('../บางบอน.png.jpg'); /* ใส่ชื่อไฟล์รูปภาพที่คุณอัปโหลดขึ้นไป */
+    background-image: url('บางบอน.png'); /* ใส่ชื่อไฟล์รูปภาพที่คุณอัปโหลดขึ้นไป */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
