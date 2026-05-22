@@ -1,0 +1,7 @@
+body {
+    background-image: url('ชื่อไฟล์ภาพของคุณ.jpg'); /* หรือใส่ URL ของภาพ */
+    background-size: cover;                        /* ปรับภาพให้พอดีเต็มหน้าจอ */
+    background-position: center;                  /* จัดวางภาพให้อยู่ตรงกลาง */
+    background-repeat: no-repeat;                 /* ไม่ให้ภาพซ้ำซ้อนกัน */
+    background-attachment: fixed;                 /* ล็อกภาพพื้นหลังไว้ไม่ให้เลื่อนตามการ Scroll */
+}
