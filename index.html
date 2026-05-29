@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน  V3.2.3</title>
+    <title>ส.ดพ.บางบอน  V3.2.4</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -59,7 +59,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.2.3</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.2.4</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -245,7 +245,7 @@
         
         <div id="today-duty-details" class="grid grid-cols-2 gap-3 text-sm">
             <div class="col-span-2 text-center py-4 text-zinc-500">
-                <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรวันนี้จากตารางเว็บ...
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรวันนี้จากระบบ...
             </div>
         </div>
     </div>
@@ -326,7 +326,7 @@
         }
     }
 
-    // 🌟 ระบบสแกนข้อมูลจากหน้าเว็บ PubHTML ค้นหาแถววันที่แบบแม่นยำ ไม่ติด Error สิทธิ์แน่นอน
+    // ⚡ ระบบอ่านตารางตรงจากกูเกิลความเร็วสูง แมปหาคำหลักของวันและเดือนปัจจุบันโดยไม่ต้องผ่าน Proxy
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -341,41 +341,37 @@
         if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + fullYearTh;
 
         try {
-            // ดึงโครงสร้าง HTML จากหน้าเว็บ เผยแพร่โดยตรง ข้าม CORS Proxy ปลอดภัย
-            const targetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml?widget=false&headers=false&chrome=false";
-            const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl));
-            if(!res.ok) throw new Error("Proxy error");
-            const proxyData = await res.json();
-            const htmlString = proxyData.contents;
+            // ใช้คำสั่งส่งแบบตรงเข้า Endpoint Visualization API ซึ่งให้สิทธิ์สาธารณะชัวร์ 100%
+            const response = await fetch("https://docs.google.com/spreadsheets/d/1kYaiSf24Jb9wExhx8_HFcMK_fDQ2i_560gJu7qTm4Bg/gviz/tq?tqx=out:json&gid=0");
+            const text = await response.text();
+            
+            const jsonString = text.substring(text.indexOf("google.visualization.Query.setResponse(") + 38, text.length - 2);
+            const data = JSON.parse(jsonString);
+            const rows = data.table.rows;
 
-            // แปลงข้อความเป็น DOM เพื่อดึงข้อมูลตารางทีละแถว
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlString, 'text/html');
-            const rows = doc.querySelectorAll('table tbody tr');
-
-            let matchedRowCells = null;
-
-            for(let i=0; i<rows.length; i++) {
-                const cells = rows[i].querySelectorAll('td');
-                if(cells.length >= 2) {
-                    const cellDateText = cells[0].innerText.trim(); // คอลัมน์ วันที่
-                    const cellMonthText = cells[1].innerText.trim(); // คอลัมน์ เดือน
+            let foundRow = null;
+            for (let i = 0; i < rows.length; i++) {
+                const cellDay = rows[i].c[0];
+                const cellMonth = rows[i].c[1];
+                if (cellDay && cellMonth) {
+                    const dayText = (cellDay.f || cellDay.v || "").toString().trim();
+                    const monthText = (cellMonth.f || cellMonth.v || "").toString().trim();
                     
-                    // แมปหาวันปัจจุบันตรงๆ เช่น "29" และ "พฤษภาคม"
-                    if(cellDateText == day.toString() && cellMonthText.includes(currentMonthName)) {
-                        matchedRowCells = cells;
+                    // จับคู่ตรงๆ คอลัมน์ที่ 1 เป็นเลขวัน และคอลัมน์ที่ 2 เป็นชื่อเดือน
+                    if (dayText == day.toString() && monthText.includes(currentMonthName)) {
+                        foundRow = rows[i].c;
                         break;
                     }
                 }
             }
 
-            if (matchedRowCells) {
-                const dutySet = matchedRowCells[2] ? matchedRowCells[2].innerText.trim() : '-';
-                const radioOp = matchedRowCells[3] ? matchedRowCells[3].innerText.trim() : '-';
-                const clerk   = matchedRowCells[4] ? matchedRowCells[4].innerText.trim() : '-';
-                const guard   = matchedRowCells[5] ? matchedRowCells[5].innerText.trim() : '-';
-                const pos501  = matchedRowCells[6] ? matchedRowCells[6].innerText.trim() : '-';
-                const timeStr  = matchedRowCells[7] ? matchedRowCells[7].innerText.trim() : '-';
+            if (foundRow) {
+                const dutySet = foundRow[2] ? (foundRow[2].f || foundRow[2].v || '-') : '-';
+                const radioOp = foundRow[3] ? (foundRow[3].f || foundRow[3].v || '-') : '-';
+                const clerk = foundRow[4] ? (foundRow[4].f || foundRow[4].v || '-') : '-';
+                const guard = foundRow[5] ? (foundRow[5].f || foundRow[5].v || '-') : '-';
+                const pos501 = foundRow[6] ? (foundRow[6].f || foundRow[6].v || '-') : '-';
+                const timeStr = foundRow[7] ? (foundRow[7].f || foundRow[7].v || '-') : '-';
 
                 detailsContainer.innerHTML = `
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
@@ -404,12 +400,12 @@
                     </div>
                 `;
             } else {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ดึงตารางสำเร็จ แต่อาจพิมพ์ชื่อเดือน/เลขวันไม่ตรงกันในแผ่นงาน</div>`;
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> เชื่อมต่อสำเร็จ แต่อาจพิมพ์ชื่อเดือน/เลขวันไม่ตรงกันในแผ่นงาน</div>`;
             }
 
         } catch (error) {
             console.error(error);
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> โหลดข้อมูลเวรวันนี้ไม่สำเร็จ แต่อ่านตารางเต็มด้านล่างแทนได้ครับ</div>`;
+            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ระบบเชื่อมข้อมูลขัดข้อง แต่อ่านตารางเต็มแถวด้านล่างได้ครับ</div>`;
         }
     }
 
