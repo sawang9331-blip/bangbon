@@ -297,7 +297,7 @@
 <div id="copyHint" class="fixed top-5 left-5 right-5 bg-green-600 text-white p-3 rounded-xl font-bold text-center z-50 shadow-xl hidden animate-bounce"><i class="fa-solid fa-circle-check mr-2"></i> บันทึกข้อมูลเรียบร้อย!</div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbww1nLeAMBA9aWq0aFQ7l4QD6YkPWlv7b7oe3kq5TavxDnQj7k3y01PmaTTBrAOJFuK/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyw6HXgip3VBpMfnwXE5mLXKu8wTylhbA0Dr-QWh6nhv_38BoMWmf5v70V35HIBQmh0/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
@@ -382,11 +382,19 @@
         let htmlDetails = "";
 
         records.forEach(function(record) {
-            let roles = [];
-            if (record.radioOp.includes(targetId)) roles.push("พนักงานวิทยุ");
-            if (record.clerk.includes(targetId)) roles.push("เสมียนเวร");
-            if (record.guard.includes(targetId)) roles.push("รักษาสถานที่");
-            if (record.pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
+         let roles = [];
+            
+            // 1. เพิ่มการแปลงค่าและตัดช่องว่าง (เคาะเว้นวรรค) ออกให้สะอาดก่อนเช็ก
+            let radio = record.radioOp ? record.radioOp.toString().trim() : '';
+            let clerk = record.clerk ? record.clerk.toString().trim() : '';
+            let guard = record.guard ? record.guard.toString().trim() : '';
+            let pos501 = record.pos501 ? record.pos501.toString().trim() : '';
+
+            // 2. เปลี่ยนมาใช้ตัวแปรตัวเล็กที่ตัดช่องว่างแล้วในการเช็ครหัส
+            if (radio.includes(targetId)) roles.push("พนักงานวิทยุ");
+            if (clerk.includes(targetId)) roles.push("เสมียนเวร");
+            if (guard.includes(targetId)) roles.push("รักษาสถานที่");
+            if (pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
 
             if (roles.length > 0) {
                 totalDays++;
