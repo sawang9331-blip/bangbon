@@ -331,7 +331,7 @@
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
-    let globalAllSheetsData = {}; // คลังข้อมูลเวรล่วงหน้าทั้งหมด
+    let globalAllSheetsData = {}; 
 
     function switchTab(tabId) {
         const contents = document.querySelectorAll('.tab-content');
@@ -379,39 +379,44 @@
             const response = await fetch(APPS_SCRIPT_URL);
             const data = await response.json();
 
-            // จัดเก็บข้อมูลรายเดือนทั้งหมดเข้าหน่วยความจำเพื่อใช้สืบค้นแบบออฟไลน์บนหน้าเว็บ
             if(data && data.allSheetsData) {
                 globalAllSheetsData = data.allSheetsData;
             }
 
             if (data && data.found) {
+                function cleanValue(val) {
+                    if (!val) return '-';
+                    let str = val.toString().trim();
+                    if (str.match(/^\d{4}-\d{2}-\d{2}T/)) return "ไม่ระบุข้อมูล"; 
+                    return str;
+                }
+
                 detailsContainer.innerHTML = `
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่</span>
-                        <span class="font-bold text-white text-base">${data.dutySet}</span>
+                        <span class="font-bold text-white text-base">${cleanValue(data.dutySet)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-clock mr-1 text-yellow-400"></i> เวลาเข้าเวร / Status</span>
-                        <span class="font-bold text-amber-400">${data.timeStr}</span>
+                        <span class="font-bold text-amber-400">${cleanValue(data.timeStr)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ</span>
-                        <span class="text-zinc-200 font-bold">${data.radioOp}</span>
+                        <span class="text-zinc-200 font-bold">${cleanValue(data.radioOp)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร</span>
-                        <span class="text-zinc-200 font-bold">${data.clerk}</span>
+                        <span class="text-zinc-200 font-bold">${cleanValue(data.clerk)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่</span>
-                        <span class="text-zinc-200 font-bold">${data.guard}</span>
+                        <span class="text-zinc-200 font-bold">${cleanValue(data.guard)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501</span>
-                        <span class="text-zinc-200 font-bold">${data.pos501}</span>
+                        <span class="text-zinc-200 font-bold">${cleanValue(data.pos501)}</span>
                     </div>
                 `;
-                // รันระบบสืบค้นล่วงหน้าทันทีตามชื่อเริ่มต้น
                 searchIndividualDuty();
             } else {
                 detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตาราง</div>`;
@@ -422,7 +427,6 @@
         }
     }
 
-    // ฟังก์ชันคำนวณสืบค้นเวรล่วงหน้าเฉพาะบุคคล (แก้ช่องว่างในชีตให้ฉลาดขึ้น 100%)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -446,27 +450,42 @@
 
         records.forEach(function(record) {
             let roles = [];
-            let radio = record.radioOp ? record.radioOp.toString().replace(/\s+/g, '') : '';
-            let clerk = record.clerk ? record.clerk.toString().replace(/\s+/g, '') : '';
-            let guard = record.guard ? record.guard.toString().replace(/\s+/g, '') : '';
-            let pos501 = record.pos501 ? record.pos501.toString().replace(/\s+/g, '') : '';
+            
+            function cleanText(val) {
+                if (!val) return '';
+                let s = val.toString().trim();
+                if (s.match(/^\d{4}-\d{2}-\d{2}T/)) return ''; 
+                return s;
+            }
+
+            let radio = cleanText(record.radioOp);
+            let clerk = cleanText(record.clerk);
+            let guard = cleanText(record.guard);
+            let pos501 = cleanText(record.pos501);
+            let statusStr = record.status ? record.status.toString().trim() : '';
 
             if (radio.includes(targetId)) roles.push("พนักงานวิทยุ");
             if (clerk.includes(targetId)) roles.push("เสมียนเวร");
             if (guard.includes(targetId)) roles.push("รักษาสถานที่");
             if (pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
 
-            if (roles.length > 0) {
+            if (roles.length > 0 && !statusStr.includes("วันพัก")) {
                 totalDays++;
-                htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center">
-                    <span>📅 วันที่ ${record.day} ${selectedMonth} (ชุดเวร ${record.dutySet})</span>
-                    <span class="text-amber-400 font-semibold bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/20">${roles.join(', ')}</span>
+                let displaySet = record.dutySet ? record.dutySet.toString().trim() : '-';
+                let displayStatus = statusStr || 'ปกติ';
+                
+                htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
+                    <span class="text-zinc-300">📅 วันที่ ${record.day} ${selectedMonth} (ชุดเวร ${displaySet})</span>
+                    <div class="text-right">
+                        <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roles.join(', ')}</span>
+                        <span class="text-zinc-500 text-[10px] block mt-0.5">${displayStatus}</span>
+                    </div>
                 </div>`;
             }
         });
 
-        summaryEl.innerText = `รหัส บางบอน ${targetId} เดือน [${selectedMonth}] รวมเข้าเวร: ${totalDays} วัน`;
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบรายชื่อเข้าปฏิบัติงานในเดือน ${selectedMonth}</div>`;
+        summaryEl.innerText = `รหัส บางบอน ${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
+        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบรายชื่อในเวรเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
     }
 
