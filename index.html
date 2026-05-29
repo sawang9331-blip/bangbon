@@ -513,11 +513,239 @@
         } finally { btn.disabled = false; btn.innerText = "ยืนยันส่งข้อมูล"; }
     }
 
+    <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwt1EcxmNjgPGy1vIqfMHa3mOgEUySJ-vEsGb7bEfxFXwLzCyVr-0XKU2EcDyQ-Pzpi/exec";
+    const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
+    const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
+
+    let globalAllSheetsData = {}; // คลังเก็บข้อมูลเวรแยกตามเดือนเพื่อใช้งานรายบุคคล
+
+    function switchTab(tabId) {
+        const contents = document.querySelectorAll('.tab-content');
+        const navs = document.querySelectorAll('.nav-item');
+        for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; contents[i].classList.remove('active'); }
+        for (let j = 0; j < navs.length; j++) { navs[j].classList.remove('active'); }
+        
+        const targetTab = document.getElementById('tab-' + tabId);
+        const targetNav = document.getElementById('nav-' + tabId);
+        if (targetTab) { targetTab.style.display = 'block'; targetTab.classList.add('active'); }
+        if (targetNav) targetNav.classList.add('active');
+        
+        window.scrollTo(0, 0);
+        if (tabId === 'schedule') fetchTodayDuty();
+    }
+
+    async function fetchTodayDuty() {
+        const detailsContainer = document.getElementById('today-duty-details');
+        const badgeContainer = document.getElementById('today-date-badge');
+        
+        const d = new Date();
+        const day = d.getDate();
+        const thaiMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const currentMonthName = thaiMonthsFull[d.getMonth()];
+        
+        if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + (d.getFullYear() + 543);
+
+        try {
+            const response = await fetch(APPS_SCRIPT_URL);
+            const data = await response.json();
+
+            if (data) {
+                // บันทึกฐานข้อมูลเวรทั้งหมดเข้าสู่หน้าเว็บ
+                if (data.allSheetsData) {
+                    globalAllSheetsData = data.allSheetsData;
+                }
+
+                if (data.found) {
+                    detailsContainer.innerHTML = `
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">ชุดปฏิบัติหน้าที่</span><span class="font-bold text-white text-base">${data.dutySet}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">เวลาเข้าเวร / Status</span><span class="font-bold text-amber-400">${data.timeStr}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">พนักงานวิทยุ</span><span class="text-zinc-200 font-bold">${data.radioOp}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">เสมียนเวร</span><span class="text-zinc-200 font-bold">${data.clerk}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">รักษาสถานที่</span><span class="text-zinc-200 font-bold">${data.guard}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">ตำแหน่ง 501</span><span class="text-zinc-200 font-bold">${data.pos501}</span></div>
+                    `;
+                } else {
+                    detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400">ไม่พบข้อมูลเวรวันนี้ในระบบ</div>`;
+                }
+                // สั่งประมวลผลค้นหารายบุคคลทันทีหลังโหลดเสร็จ
+                searchIndividualDuty();
+            }
+        } catch (error) {
+            console.error(error);
+            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400">เชื่อมต่อตารางไม่สำเร็จ ดูกราฟฟิกด้านล่างแทนได้ครับ</div>`;
+        }
+    }
+
+    // ฟังก์ชันค้นหาเวรปฏิบัติงานรายบุคคลล่วงหน้า/ย้อนหลัง
+    function searchIndividualDuty() {
+        const monthEl = document.getElementById('search-month-select');
+        const staffEl = document.getElementById('search-staff-id');
+        const resultBox = document.getElementById('individual-result');
+        const summaryEl = document.getElementById('ind-summary');
+        const listEl = document.getElementById('ind-details-list');
+        
+        if (!monthEl || !staffEl || !staffEl.value) {
+            if (resultBox) resultBox.classList.add('hidden');
+            return;
+        }
+
+        const selectedMonth = monthEl.value; // ดึงชื่อเดือน เช่น "มิถุนายน"
+        const targetId = staffEl.value;      // ดึงรหัสบุคคล เช่น "2-2"
+        
+        // ค้นหาแท็บกูเกิลชีตที่มีคำว่า มิถุนายน
+        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
+        let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
+
+        let totalDays = 0;
+        let htmlDetails = "";
+
+        records.forEach(function(record) {
+            let roles = [];
+            // ดึงค่าตำแหน่งเวรแต่ละคอลัมน์มาตรวจสอบรหัส
+            let radio = record.radioOp ? record.radioOp.toString() : '';
+            let clerk = record.clerk ? record.clerk.toString() : '';
+            let guard = record.guard ? record.guard.toString() : '';
+            let pos501 = record.pos501 ? record.pos501.toString() : '';
+
+            if (radio.includes(targetId)) roles.push("พนักงานวิทยุ");
+            if (clerk.includes(targetId)) roles.push("เสมียนเวร");
+            if (guard.includes(targetId)) roles.push("รักษาสถานที่");
+            if (pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
+
+            // หากเจอว่าเข้าเวรในวันนั้นจริง
+            if (roles.length > 0) {
+                totalDays++;
+                htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
+                    <span class="text-zinc-300">📅 วันที่ ${record.day} ${selectedMonth} (ชุดเวร ${record.dutySet})</span>
+                    <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roles.join(', ')}</span>
+                </div>`;
+            }
+        });
+
+        summaryEl.innerText = `รหัส บางบอน ${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
+        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบรายชื่อในระบบเวรของเดือน ${selectedMonth}</div>`;
+        resultBox.classList.remove('hidden');
+    }
+
+    function initSearchDropdown() {
+        const selectEl = document.getElementById('search-staff-id');
+        const monthEl = document.getElementById('search-month-select');
+        if (!selectEl) return;
+        
+        for (let g = 1; g <= 4; g++) {
+            for (let i = 1; i <= 10; i++) {
+                const idStr = g + '-' + i;
+                const opt = document.createElement('option');
+                opt.value = idStr; opt.innerText = 'บางบอน ' + idStr;
+                selectEl.appendChild(opt);
+            }
+        }
+
+        const d = new Date();
+        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        if (monthEl) monthEl.value = thaiMonths[d.getMonth()];
+    }
+
+    function updateLivePreview(inputId, outputId) {
+        const inputEl = document.getElementById(inputId);
+        const outEl = document.getElementById(outputId);
+        if (inputEl && outEl) { outEl.innerText = inputEl.value ? "ตรวจสอบ: " + inputEl.value : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)"; }
+    }
+
+    function generateStaff() {
+        let htmlTeam = ''; let htmlSend = '';
+        for (let g = 1; g <= 4; g++) {
+            htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            for (let i = 1; i <= 10; i++) {
+                const name = 'บางบอน ' + g + '-' + i;
+                htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
+                htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
+            }
+            htmlTeam += '</div>'; htmlSend += '</div>';
+        }
+        document.getElementById('fire_team_list').innerHTML = htmlTeam;
+        document.getElementById('res_team_list').innerHTML = htmlTeam;
+        document.getElementById('fire_sender_list').innerHTML = htmlSend;
+        document.getElementById('res_sender_list').innerHTML = htmlSend;
+    }
+
+    function getThaiDate() {
+        const d = new Date();
+        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        return "วันที่ " + d.getDate() + " " + m[d.getMonth()] + " " + (d.getFullYear() + 543);
+    }
+
+    function toggleOther() {
+        const s = document.getElementById('res_type_text');
+        const input = document.getElementById('res_type_other');
+        const lp = document.getElementById('lp_res_type');
+        if(s && input && lp) { const show = s.value === 'เหตุอื่นๆ'; input.style.display = show ? 'block' : 'none'; lp.style.display = show ? 'block' : 'none'; }
+    }
+
+    let pendingData = null;
+
+    function prepareReport(type) {
+        let text = ""; let json = {}; const dateStr = getThaiDate();
+        if (type === 'fire') {
+            const place = document.getElementById('fire_place').value || '-';
+            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
+            const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
+            const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
+            const t = { 1: document.getElementById('f_t1').value || '-', 2: document.getElementById('f_t2').value || '-', 3: document.getElementById('f_t3').value || '-', 4: document.getElementById('f_t4').value || '-', 5: document.getElementById('f_t5').value || '-' };
+            text = dateStr + "\nส.ดพ.บางบอน\n🔥 รายงานเหตุเพลิงไหม้\n------------------\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + cars + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
+            json = { type: "เพลิงไหม้", date: dateStr, place: place, len: "-", staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: cars };
+        } else {
+            let animal = document.getElementById('res_type_text').value;
+            if (animal === 'เหตุอื่นๆ') animal = document.getElementById('res_type_other').value || 'เหตุอื่นๆ';
+            const place = document.getElementById('res_place').value || '-';
+            const size = document.getElementById('res_len_text').value || '-';
+            const car = document.getElementById('res_car_single').value || '-';
+            const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(e => e.value).join(', ') || '-';
+            const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
+            const t = { 1: document.getElementById('r_t1').value || '-', 2: document.getElementById('r_t2').value || '-', 3: document.getElementById('r_t3').value || '-', 4: document.getElementById('r_t4').value || '-', 5: document.getElementById('r_t5').value || '-' };
+            text = dateStr + "\nส.ดพ.บางบอน\n🐾 ช่วยเหลือประชาชน (" + animal + ")\n------------------\n📏 ขนาด: " + size + "\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + car + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
+            json = { type: "501 (" + animal + ")", date: dateStr, place: place, len: size, staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: car };
+        }
+        pendingData = { text: text, json: json };
+        document.getElementById('previewBody').innerText = text;
+        document.getElementById('previewOverlay').style.display = 'flex';
+    }
+
+    function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
+
+    async function sendFinal() {
+        if (!pendingData) return;
+        const btn = document.getElementById('btnConfirmSend');
+        btn.disabled = true; btn.innerText = "กำลังบันทึก...";
+        try { await navigator.clipboard.writeText(pendingData.text); } catch (e) {}
+
+        try {
+            const res = await fetch(SB_URL, {
+                method: 'POST',
+                headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify(pendingData.json)
+            });
+            if (!res.ok) throw new Error();
+            document.getElementById('copyHint').classList.remove('hidden');
+            setTimeout(() => document.getElementById('copyHint').classList.add('hidden'), 3000);
+            closePreview(); switchTab('home');
+        } catch (err) {
+            alert("คัดลอกรายงานเรียบร้อยแล้ว วางส่งไลน์ได้เลยครับ!");
+            closePreview(); switchTab('home');
+        } finally { btn.disabled = false; btn.innerText = "ยืนยันส่งข้อมูล"; }
+    }
+
     window.addEventListener("load", function() {
         generateStaff();
         initSearchDropdown();
         switchTab('home'); 
         document.getElementById('current-date').innerText = getThaiDate();
+        
+        // ผูกปุ่มเข้าสู่ฟังก์ชันยืนยันส่งข้อมูลที่หายไปในโค้ดเดิม
+        const confirmBtn = document.getElementById('btnConfirmSend');
+        if(confirmBtn) { confirmBtn.onclick = sendFinal; }
     });
 </script>
 </body>
