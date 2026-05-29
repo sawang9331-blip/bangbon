@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน  V3.2.7</title>
+    <title>ส.ดพ.บางบอน  V3.3.0</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,12 +23,8 @@
     user-select: none;
     }
         
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
         input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
@@ -48,8 +44,6 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
         .modal-container { background: #1e1e1e; padding: 20px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #444; max-height: 85vh; display: flex; flex-direction: column; }
         .modal-body { overflow-y: auto; flex-grow: 1; margin: 15px 0; background: #000; color: #00ff41; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 0.95em; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -59,7 +53,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.2.5</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.3.0</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -112,14 +106,12 @@
         <i class="fa-solid fa-fire text-red-500 text-xl"></i>
         <h2 class="text-lg font-bold text-white">บันทึกเหตุเพลิงไหม้</h2>
     </div>
-    
     <div class="space-y-4">
         <div>
             <label>📍 สถานที่เกิดเหตุ</label>
             <input type="text" id="fire_place" placeholder="ระบุสถานที่..." oninput="updateLivePreview('fire_place', 'lp_fire_place')">
             <div id="lp_fire_place" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุสถานที่)</div>
         </div>
-        
         <div>
             <label>🚒 รถที่ออกเหตุ (เลือกตามลำดับ)</label>
             <div class="grid grid-cols-3 gap-2 mt-1">
@@ -128,7 +120,6 @@
                 <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 061-1">061-2</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
             </div>
         </div>
-
         <div>
             <label>⏰ บันทึกเวลาปฏิบัติการ</label>
             <div class="grid grid-cols-2 gap-2 mt-1">
@@ -139,17 +130,14 @@
             </div>
             <div class="mt-2"><span class="text-xs text-zinc-400">ว.10 กลับถึง ส.ดพ.</span><input type="time" id="f_t5"></div>
         </div>
-        
         <div>
             <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
             <div class="staff-selector"><div id="fire_team_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
-        
         <div>
             <label>📢 ผู้รายงานเหตุ</label>
             <div class="staff-selector"><div id="fire_sender_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
-        
         <button type="button" class="w-full bg-red-600 text-white p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('fire')">
             <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานเพลิงไหม้
         </button>
@@ -161,7 +149,6 @@
         <i class="fa-solid fa-handshake-angle text-yellow-500 text-xl"></i>
         <h2 class="text-lg font-bold text-white">บันทึกช่วยเหลือประชาชน</h2>
     </div>
-    
     <div class="space-y-4">
         <div>
             <label>🐾 ชนิดสัตว์ / ประเภทเหตุ</label>
@@ -174,19 +161,16 @@
             <input type="text" id="res_type_other" style="display:none; margin-top:10px;" placeholder="ระบุเหตุอื่นๆ" oninput="updateLivePreview('res_type_other', 'lp_res_type')">
             <div id="lp_res_type" class="live-review-box" style="display:none;"></div>
         </div>
-
         <div>
             <label>📏 ขนาด / จำนวน</label>
             <input type="text" id="res_len_text" placeholder="เช่น 2 เมตร หรือ 1 ตัว" oninput="updateLivePreview('res_len_text', 'lp_res_len')">
             <div id="lp_res_len" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุขนาด)</div>
         </div>
-
         <div>
             <label>📍 สถานที่เกิดเหตุ</label>
             <input type="text" id="res_place" placeholder="บ้านเลขที่, ซอย, ถนน..." oninput="updateLivePreview('res_place', 'lp_res_place')">
             <div id="lp_res_place" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุสถานที่)</div>
         </div>
-        
         <div>
             <label>🚒 รถที่ออกเหตุ</label>
             <select id="res_car_single">
@@ -197,11 +181,9 @@
                 <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
                 <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
                 <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
-                <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
                 <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
             </select>
         </div>
-
         <div>
             <label>⏰ บันทึกเวลาปฏิบัติการ</label>
             <div class="grid grid-cols-2 gap-2 mt-1">
@@ -212,17 +194,14 @@
             </div>
             <div class="mt-2"><span class="text-xs text-zinc-400">ว.10 กลับถึง ส.ดพ.</span><input type="time" id="r_t5"></div>
         </div>
-
         <div>
             <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
             <div class="staff-selector"><div id="res_team_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
-
         <div>
             <label>📢 ผู้รายงานเหตุ</label>
             <div class="staff-selector"><div id="res_sender_list">กำลังโหลดรายชื่อ...</div></div>
         </div>
-
         <button type="button" class="w-full bg-amber-500 text-black p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('rescue')">
             <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานการช่วยเหลือ
         </button>
@@ -242,7 +221,6 @@
             </span>
             <span id="today-date-badge" class="text-xs bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">กำลังโหลด...</span>
         </div>
-        
         <div id="today-duty-details" class="grid grid-cols-2 gap-3 text-sm">
             <div class="col-span-2 text-center py-4 text-zinc-500">
                 <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรวันนี้จากระบบ...
@@ -252,53 +230,62 @@
 
     <div class="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-4 shadow-md">
         <span class="text-sm font-bold text-yellow-400 flex items-center gap-1 mb-2">
-            <i class="fa-solid fa-magnifying-glass"></i> ตรวจสอบตารางเวรรายบุคคล (ของเดือนนี้)
+            <i class="fa-solid fa-magnifying-glass"></i> ค้นหาเวรปฏิบัติงานรายบุคคล (ล่วงหน้า/ย้อนหลัง)
         </span>
-        <div class="flex gap-2 items-center">
-            <select id="search-staff-id" class="mt-0" onchange="searchIndividualDuty()">
-                <option value="">-- เลือกรหัสเจ้าหน้าที่ --</option>
+        
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label class="text-xs text-zinc-400">1. เลือกเดือนที่ต้องการ</label>
+                <select id="search-month-select" onchange="searchIndividualDuty()">
+                    <option value="มกราคม">มกราคม</option>
+                    <option value="กุมภาพันธ์">กุมภาพันธ์</option>
+                    <option value="มีนาคม">มีนาคม</option>
+                    <option value="เมษายน">เมษายน</option>
+                    <option value="พฤษภาคม">พฤษภาคม</option>
+                    <option value="มิถุนายน">มิถุนายน</option>
+                    <option value="กรกฎาคม">กรกฎาคม</option>
+                    <option value="สิงหาคม">สิงหาคม</option>
+                    <option value="กันยายน">กันยายน</option>
+                    <option value="ตุลาคม">ตุลาคม</option>
+                    <option value="พฤศจิกายน">พฤศจิกายน</option>
+                    <option value="ธันวาคม">ธันวาคม</option>
                 </select>
+            </div>
+            <div>
+                <label class="text-xs text-zinc-400">2. เลือกรหัสเจ้าหน้าที่</label>
+                <select id="search-staff-id" onchange="searchIndividualDuty()">
+                    <option value="">-- เลือกรหัส --</option>
+                </select>
+            </div>
         </div>
         
         <div id="individual-result" class="mt-3 hidden">
             <div class="bg-black/40 p-2 rounded border border-zinc-700 text-sm mb-2 text-green-400 font-bold" id="ind-summary">
-                รวมเข้าเวรเดือนนี้ทั้งหมด: 0 วัน
+                รวมเข้าเวรทั้งหมด: 0 วัน
             </div>
             <div class="max-h-40 overflow-y-auto text-xs space-y-1 bg-zinc-950 p-2 rounded" id="ind-details-list">
                 </div>
         </div>
     </div>
 
-    <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">ตารางเวรรวมทั้งหมด (เลื่อนดูด้านล่างได้)</p>
-    <div class="w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 480px);">
+    <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">ตารางเวรรวมทั้งหมด</p>
+    <div class="w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 520px);">
         <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml?widget=false&amp;headers=false&amp;chrome=false" class="w-full h-full border-0 bg-white"></iframe>
     </div>
 </div>
 
 <div class="nav-bar">
     <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
-        <i class="fa-solid fa-house"></i>
-        <span>หน้าแรก</span>
+        <i class="fa-solid fa-house"></i><span>หน้าแรก</span>
     </div>
-    <div id="nav-fire" class="nav-item" onclick="switchTab('fire')">
-        <i class="fa-solid fa-fire"></i>
-        <span>เพลิงไหม้</span>
-    </div>
-    <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')">
-        <i class="fa-solid fa-handshake-angle"></i>
-        <span>ช่วยเหลือ</span>
-    </div>
-    <div id="nav-schedule" class="nav-item" onclick="switchTab('schedule')">
-        <i class="fa-solid fa-calendar-days"></i>
-        <span>ตารางเวร</span>
-    </div>
+    <div id="nav-fire" class="nav-item" onclick="switchTab('fire')"><i class="fa-solid fa-fire"></i><span>เพลิงไหม้</span></div>
+    <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')"><i class="fa-solid fa-handshake-angle"></i><span>ช่วยเหลือ</span></div>
+    <div id="nav-schedule" class="nav-item" onclick="switchTab('schedule')"><i class="fa-solid fa-calendar-days"></i><span>ตารางเวร</span></div>
 </div>
 
 <div id="previewOverlay" class="overlay">
     <div class="modal-container">
-        <h3 class="text-lg font-bold text-white border-b border-zinc-700 pb-2 flex items-center gap-2">
-            <i class="fa-solid fa-square-check text-green-500"></i> ตรวจสอบรายงานขั้นสุดท้าย
-        </h3>
+        <h3 class="text-lg font-bold text-white border-b border-zinc-700 pb-2 flex items-center gap-2"><i class="fa-solid fa-square-check text-green-500"></i> ตรวจสอบรายงานขั้นสุดท้าย</h3>
         <div id="previewBody" class="modal-body"></div>
         <div class="flex gap-3">
             <button type="button" class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white cursor-pointer" onclick="closePreview()">กลับไปแก้ไข</button>
@@ -307,45 +294,28 @@
     </div>
 </div>
 
-<div id="copyHint" class="fixed top-5 left-5 right-5 bg-green-600 text-white p-3 rounded-xl font-bold text-center z-50 shadow-xl hidden animate-bounce">
-    <i class="fa-solid fa-circle-check mr-2"></i> บันทึกและคัดลอกข้อความเรียบร้อย!
-</div>
+<div id="copyHint" class="fixed top-5 left-5 right-5 bg-green-600 text-white p-3 rounded-xl font-bold text-center z-50 shadow-xl hidden animate-bounce"><i class="fa-solid fa-circle-check mr-2"></i> บันทึกข้อมูลเรียบร้อย!</div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZHQEqCIMamREVBI0YXg4VaLOsAx4-74v_uqles6p_INbtUE7b-MAosEPOaNM8OxUl/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKEURd3Uu_P1qwg87a2IUMmK2MduJwUqbNjrnr7T4B3-jJrH8oJNbLVqomnhOhU9me/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
-    let globalMonthRecords = []; // ตัวแปรเก็บข้อมูลเวรทั้งเดือนที่ดึงมาจากชีต
+    let globalAllSheetsData = {}; // เก็บข้อมูลเวรทุกเดือนแยกตามชื่อหน้าชีต
 
     function switchTab(tabId) {
         const contents = document.querySelectorAll('.tab-content');
         const navs = document.querySelectorAll('.nav-item');
-        
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].style.display = 'none';
-            contents[i].classList.remove('active');
-        }
-        for (let j = 0; j < navs.length; j++) {
-            navs[j].classList.remove('active');
-        }
+        for (let i = 0; i < contents.length; i++) { contents[i].style.display = 'none'; contents[i].classList.remove('active'); }
+        for (let j = 0; j < navs.length; j++) { navs[j].classList.remove('active'); }
         
         const targetTab = document.getElementById('tab-' + tabId);
         const targetNav = document.getElementById('nav-' + tabId);
-        
-        if (targetTab) {
-            targetTab.style.display = 'block';
-            targetTab.classList.add('active');
-        }
-        if (targetNav) {
-            targetNav.classList.add('active');
-        }
+        if (targetTab) { targetTab.style.display = 'block'; targetTab.classList.add('active'); }
+        if (targetNav) targetNav.classList.add('active');
         
         window.scrollTo(0, 0);
-
-        if (tabId === 'schedule') {
-            fetchTodayDuty();
-        }
+        if (tabId === 'schedule') fetchTodayDuty();
     }
 
     async function fetchTodayDuty() {
@@ -354,79 +324,65 @@
         
         const d = new Date();
         const day = d.getDate();
-        const fullYearTh = d.getFullYear() + 543;
         const thaiMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const currentMonthName = thaiMonthsFull[d.getMonth()];
         
-        if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + fullYearTh;
+        if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + (d.getFullYear() + 543);
 
         try {
             const response = await fetch(APPS_SCRIPT_URL);
             const data = await response.json();
 
-            if (data && data.found) {
-                // เก็บข้อมูลทั้งเดือนลงตัวแปรรอไว้ค้นหา
-                if (data.monthRecords) {
-                    globalMonthRecords = data.monthRecords;
+            if (data) {
+                if (data.allSheetsData) {
+                    globalAllSheetsData = data.allSheetsData;
                 }
 
-                detailsContainer.innerHTML = `
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่</span>
-                        <span class="font-bold text-white text-base">${data.dutySet}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-clock mr-1 text-yellow-400"></i> เวลาเข้าเวร / Status</span>
-                        <span class="font-bold text-amber-400">${data.timeStr}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ</span>
-                        <span class="text-zinc-200 font-bold">${data.radioOp}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร</span>
-                        <span class="text-zinc-200 font-bold">${data.clerk}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่</span>
-                        <span class="text-zinc-200 font-bold">${data.guard}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501</span>
-                        <span class="text-zinc-200 font-bold">${data.pos501}</span>
-                    </div>
-                `;
-                
-                // หากมีการเลือกค้นหาค้างไว้ ให้กดอัปเดตผลลัพธ์ด้วย
+                if (data.found) {
+                    detailsContainer.innerHTML = `
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">ชุดปฏิบัติหน้าที่</span><span class="font-bold text-white text-base">${data.dutySet}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">เวลาเข้าเวร / Status</span><span class="font-bold text-amber-400">${data.timeStr}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">พนักงานวิทยุ</span><span class="text-zinc-200 font-bold">${data.radioOp}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">เสมียนเวร</span><span class="text-zinc-200 font-bold">${data.clerk}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">รักษาสถานที่</span><span class="text-zinc-200 font-bold">${data.guard}</span></div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50"><span class="text-xs text-zinc-400 block">ตำแหน่ง 501</span><span class="text-zinc-200 font-bold">${data.pos501}</span></div>
+                    `;
+                } else {
+                    detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400">ไม่พบข้อมูลเวรวันนี้ในระบบ</div>`;
+                }
                 searchIndividualDuty();
-            } else {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตาราง</div>`;
             }
         } catch (error) {
             console.error(error);
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เชื่อมข้อมูลล้มเหลว แต่อ่านตารางรวมด้านล่างแทนได้ครับ</div>`;
+            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400">เชื่อมต่อตารางไม่สำเร็จ ดูกราฟฟิกด้านล่างแทนได้ครับ</div>`;
         }
     }
 
-    // ฟังก์ชันค้นหาและคำนวณเวรของแต่ละบุคคลแบบ Real-time
+    // ฟังก์ชันค้นหาแบบระบุทั้ง "เดือน" และ "รหัสบุคคล" เพื่อรองรับเวรล่วงหน้า
     function searchIndividualDuty() {
-        const selectEl = document.getElementById('search-staff-id');
+        const monthEl = document.getElementById('search-month-select');
+        const staffEl = document.getElementById('search-staff-id');
         const resultBox = document.getElementById('individual-result');
         const summaryEl = document.getElementById('ind-summary');
         const listEl = document.getElementById('ind-details-list');
         
-        if (!selectEl || !selectEl.value || globalMonthRecords.length === 0) {
+        if (!monthEl || !staffEl || !staffEl.value) {
             if (resultBox) resultBox.classList.add('hidden');
             return;
         }
 
-        const targetId = selectEl.value; // เช่น "2-2" หรือ "บางบอน 2-2"
+        const selectedMonth = monthEl.value; // เช่น "มิถุนายน"
+        const targetId = staffEl.value;      // เช่น "2-2"
+        
+        // ค้นหาแท็บชีตที่มีชื่อตรงกับเดือนที่เลือก (เช่น ชื่อชีต "มิถุนายน 69" หรือ "มิถุนายน")
+        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
+        let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
+
         let totalDays = 0;
         let htmlDetails = "";
 
-        globalMonthRecords.forEach(function(record) {
+        records.forEach(function(record) {
             let roles = [];
-            // เช็กทุกตำแหน่งว่ามีรหัสนี้ไหม
             if (record.radioOp.includes(targetId)) roles.push("พนักงานวิทยุ");
             if (record.clerk.includes(targetId)) roles.push("เสมียนเวร");
             if (record.guard.includes(targetId)) roles.push("รักษาสถานที่");
@@ -435,49 +391,46 @@
             if (roles.length > 0) {
                 totalDays++;
                 htmlDetails += `<div class="p-1 border-b border-zinc-800 flex justify-between">
-                    <span class="text-zinc-300">📅 วันที่ ${record.day}: ชุดเวร ${record.dutySet}</span>
+                    <span class="text-zinc-300">📅 วันที่ ${record.day} ${selectedMonth}: ชุดเวร ${record.dutySet}</span>
                     <span class="text-amber-400 font-semibold">${roles.join(', ')}</span>
                 </div>`;
             }
         });
 
-        summaryEl.innerText = `รหัส บางบอน ${targetId} เข้าเวรเดือนนี้ทั้งหมด: ${totalDays} วัน`;
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีชื่อปฏิบัติหน้าที่ในเดือนนี้</div>`;
+        summaryEl.innerText = `รหัส บางบอน ${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
+        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบรายชื่อในเวรเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
     }
 
-    // เจนตัวเลือกรายชื่อในช่องค้นหาอัตโนมัติ
     function initSearchDropdown() {
         const selectEl = document.getElementById('search-staff-id');
+        const monthEl = document.getElementById('search-month-select');
         if (!selectEl) return;
+        
+        // เจนรหัสเจ้าหน้าที่ บางบอน 1-1 ถึง 4-10
         for (let g = 1; g <= 4; g++) {
             for (let i = 1; i <= 10; i++) {
                 const idStr = g + '-' + i;
                 const opt = document.createElement('option');
-                opt.value = idStr;
-                opt.innerText = 'บางบอน ' + idStr;
+                opt.value = idStr; opt.innerText = 'บางบอน ' + idStr;
                 selectEl.appendChild(opt);
             }
         }
+
+        // ตั้งค่าเริ่มต้นให้ช่องเลือกเดือนตรงกับเดือนปัจจุบันโดยอัตโนมัติ
+        const d = new Date();
+        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        if (monthEl) monthEl.value = thaiMonths[d.getMonth()];
     }
 
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
-        if (inputEl && outEl) {
-            const val = inputEl.value;
-            if (val) {
-                outEl.innerText = "ตรวจสอบ: " + val;
-            } else {
-                outEl.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
-            }
-        }
+        if (inputEl && outEl) { outEl.innerText = inputEl.value ? "ตรวจสอบ: " + inputEl.value : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)"; }
     }
 
     function generateStaff() {
-        let htmlTeam = '';
-        let htmlSend = '';
-        
+        let htmlTeam = ''; let htmlSend = '';
         for (let g = 1; g <= 4; g++) {
             htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
             htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
@@ -486,19 +439,12 @@
                 htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
                 htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
             }
-            htmlTeam += '</div>';
-            htmlSend += '</div>';
+            htmlTeam += '</div>'; htmlSend += '</div>';
         }
-        
-        const fTeam = document.getElementById('fire_team_list');
-        const rTeam = document.getElementById('res_team_list');
-        const fSend = document.getElementById('fire_sender_list');
-        const rSend = document.getElementById('res_sender_list');
-
-        if(fTeam) fTeam.innerHTML = htmlTeam;
-        if(rTeam) rTeam.innerHTML = htmlTeam;
-        if(fSend) fSend.innerHTML = htmlSend;
-        if(rSend) rSend.innerHTML = htmlSend;
+        document.getElementById('fire_team_list').innerHTML = htmlTeam;
+        document.getElementById('res_team_list').innerHTML = htmlTeam;
+        document.getElementById('fire_sender_list').innerHTML = htmlSend;
+        document.getElementById('res_sender_list').innerHTML = htmlSend;
     }
 
     function getThaiDate() {
@@ -509,39 +455,21 @@
 
     function toggleOther() {
         const s = document.getElementById('res_type_text');
-        const otherInput = document.getElementById('res_type_other');
-        const otherLp = document.getElementById('lp_res_type');
-        if (s && otherInput && otherLp) {
-            if (s.value === 'เหตุอื่นๆ') {
-                otherInput.style.display = 'block';
-                otherLp.style.display = 'block';
-            } else {
-                otherInput.style.display = 'none';
-                otherLp.style.display = 'none';
-            }
-        }
+        const input = document.getElementById('res_type_other');
+        const lp = document.getElementById('lp_res_type');
+        if(s && input && lp) { const show = s.value === 'เหตุอื่นๆ'; input.style.display = show ? 'block' : 'none'; lp.style.display = show ? 'block' : 'none'; }
     }
 
     let pendingData = null;
 
     function prepareReport(type) {
-        let text = "";
-        let json = {};
-        const dateStr = getThaiDate();
-
+        let text = ""; let json = {}; const dateStr = getThaiDate();
         if (type === 'fire') {
             const place = document.getElementById('fire_place').value || '-';
-            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(function(v) { return v; }).join(', ') || '-';
-            const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
+            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
+            const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('f_t1').value || '-',
-                2: document.getElementById('f_t2').value || '-',
-                3: document.getElementById('f_t3').value || '-',
-                4: document.getElementById('f_t4').value || '-',
-                5: document.getElementById('f_t5').value || '-'
-            };
-
+            const t = { 1: document.getElementById('f_t1').value || '-', 2: document.getElementById('f_t2').value || '-', 3: document.getElementById('f_t3').value || '-', 4: document.getElementById('f_t4').value || '-', 5: document.getElementById('f_t5').value || '-' };
             text = dateStr + "\nส.ดพ.บางบอน\n🔥 รายงานเหตุเพลิงไหม้\n------------------\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + cars + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
             json = { type: "เพลิงไหม้", date: dateStr, place: place, len: "-", staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: cars };
         } else {
@@ -550,24 +478,15 @@
             const place = document.getElementById('res_place').value || '-';
             const size = document.getElementById('res_len_text').value || '-';
             const car = document.getElementById('res_car_single').value || '-';
-            const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
+            const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('r_t1').value || '-',
-                2: document.getElementById('r_t2').value || '-',
-                3: document.getElementById('r_t3').value || '-',
-                4: document.getElementById('r_t4').value || '-',
-                5: document.getElementById('r_t5').value || '-'
-            };
-
+            const t = { 1: document.getElementById('r_t1').value || '-', 2: document.getElementById('r_t2').value || '-', 3: document.getElementById('r_t3').value || '-', 4: document.getElementById('r_t4').value || '-', 5: document.getElementById('r_t5').value || '-' };
             text = dateStr + "\nส.ดพ.บางบอน\n🐾 ช่วยเหลือประชาชน (" + animal + ")\n------------------\n📏 ขนาด: " + size + "\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + car + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
             json = { type: "501 (" + animal + ")", date: dateStr, place: place, len: size, staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: car };
         }
-
         pendingData = { text: text, json: json };
         document.getElementById('previewBody').innerText = text;
         document.getElementById('previewOverlay').style.display = 'flex';
-        document.getElementById('btnConfirmSend').onclick = sendFinal;
     }
 
     function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
@@ -575,57 +494,30 @@
     async function sendFinal() {
         if (!pendingData) return;
         const btn = document.getElementById('btnConfirmSend');
-        btn.disabled = true;
-        btn.innerText = "กำลังบันทึก...";
-        const text = pendingData.text;
-        const json = pendingData.json;
+        btn.disabled = true; btn.innerText = "กำลังบันทึก...";
+        try { await navigator.clipboard.writeText(pendingData.text); } catch (e) {}
 
         try {
-            await navigator.clipboard.writeText(text);
-        } catch (e) {
-            const el = document.createElement('textarea');
-            el.value = text; document.body.appendChild(el);
-            el.select(); document.execCommand('copy');
-            document.body.removeChild(el);
-        }
-
-        try {
-            const response = await fetch(SB_URL, {
+            const res = await fetch(SB_URL, {
                 method: 'POST',
-                headers: {
-                    'apikey': SB_KEY,
-                    'Authorization': 'Bearer ' + SB_KEY,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(json)
+                headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify(pendingData.json)
             });
-
-            if (!response.ok) throw new Error("Server response not OK");
-
-            const hint = document.getElementById('copyHint');
-            if(hint) hint.classList.remove('hidden');
-            setTimeout(function() { if(hint) hint.classList.add('hidden'); }, 3000);
-            btn.innerText = "Copy ให้แล้วเอาไปวางที่ไลท์ได้เลย ✅";
-            closePreview();
-            switchTab('home');
+            if (!res.ok) throw new Error();
+            document.getElementById('copyHint').classList.remove('hidden');
+            setTimeout(() => document.getElementById('copyHint').classList.add('hidden'), 3000);
+            closePreview(); switchTab('home');
         } catch (err) {
-            console.error(err);
-            alert("ระบบได้ทำการ 'คัดลอกข้อความรายงาน' สามารถกดวางส่งเข้ากลุ่มไลน์ได้ทันทีครับ!");
-            closePreview();
-            switchTab('home');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "ยืนยันส่งข้อมูล";
-        }
+            alert("คัดลอกรายงานเรียบร้อยแล้ว วางส่งไลน์ได้เลยครับ!");
+            closePreview(); switchTab('home');
+        } finally { btn.disabled = false; btn.innerText = "ยืนยันส่งข้อมูล"; }
     }
 
     window.addEventListener("load", function() {
         generateStaff();
-        initSearchDropdown(); // รันระบบดรอปดาวน์ค้นหา
+        initSearchDropdown();
         switchTab('home'); 
-        const dateEl = document.getElementById('current-date');
-        if(dateEl) dateEl.innerText = getThaiDate();
+        document.getElementById('current-date').innerText = getThaiDate();
     });
 </script>
 </body>
