@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน  V3.2.4</title>
+    <title>ส.ดพ.บางบอน  V3.2.5</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -59,7 +59,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.2.4</p>
+            <p class="text-xs text-red-200">ระบบบันทึกรายงาน V3.2.5</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -293,6 +293,7 @@
 </div>
 
 <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpxxjdRYzvGWFfRbHVoSJ3MAWMdbWup4tx66o7luloMVBmisBcrAwLiHSoAktC1lbx/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
@@ -326,7 +327,6 @@
         }
     }
 
-    // ⚡ ระบบอ่านตารางตรงจากกูเกิลความเร็วสูง แมปหาคำหลักของวันและเดือนปัจจุบันโดยไม่ต้องผ่าน Proxy
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -334,78 +334,48 @@
         const d = new Date();
         const day = d.getDate();
         const fullYearTh = d.getFullYear() + 543;
-        
         const thaiMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const currentMonthName = thaiMonthsFull[d.getMonth()];
         
         if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + fullYearTh;
 
         try {
-            // ใช้คำสั่งส่งแบบตรงเข้า Endpoint Visualization API ซึ่งให้สิทธิ์สาธารณะชัวร์ 100%
-            const response = await fetch("https://docs.google.com/spreadsheets/d/1kYaiSf24Jb9wExhx8_HFcMK_fDQ2i_560gJu7qTm4Bg/gviz/tq?tqx=out:json&gid=0");
-            const text = await response.text();
-            
-            const jsonString = text.substring(text.indexOf("google.visualization.Query.setResponse(") + 38, text.length - 2);
-            const data = JSON.parse(jsonString);
-            const rows = data.table.rows;
+            const response = await fetch(APPS_SCRIPT_URL);
+            const data = await response.json();
 
-            let foundRow = null;
-            for (let i = 0; i < rows.length; i++) {
-                const cellDay = rows[i].c[0];
-                const cellMonth = rows[i].c[1];
-                if (cellDay && cellMonth) {
-                    const dayText = (cellDay.f || cellDay.v || "").toString().trim();
-                    const monthText = (cellMonth.f || cellMonth.v || "").toString().trim();
-                    
-                    // จับคู่ตรงๆ คอลัมน์ที่ 1 เป็นเลขวัน และคอลัมน์ที่ 2 เป็นชื่อเดือน
-                    if (dayText == day.toString() && monthText.includes(currentMonthName)) {
-                        foundRow = rows[i].c;
-                        break;
-                    }
-                }
-            }
-
-            if (foundRow) {
-                const dutySet = foundRow[2] ? (foundRow[2].f || foundRow[2].v || '-') : '-';
-                const radioOp = foundRow[3] ? (foundRow[3].f || foundRow[3].v || '-') : '-';
-                const clerk = foundRow[4] ? (foundRow[4].f || foundRow[4].v || '-') : '-';
-                const guard = foundRow[5] ? (foundRow[5].f || foundRow[5].v || '-') : '-';
-                const pos501 = foundRow[6] ? (foundRow[6].f || foundRow[6].v || '-') : '-';
-                const timeStr = foundRow[7] ? (foundRow[7].f || foundRow[7].v || '-') : '-';
-
+            if (data && data.found) {
                 detailsContainer.innerHTML = `
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่</span>
-                        <span class="font-bold text-white text-base">${dutySet}</span>
+                        <span class="font-bold text-white text-base">${data.dutySet}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-clock mr-1 text-yellow-400"></i> เวลาเข้าเวร / สถานะ</span>
-                        <span class="font-bold text-amber-400">${timeStr}</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-clock mr-1 text-yellow-400"></i> เวลาเข้าเวร / Status</span>
+                        <span class="font-bold text-amber-400">${data.timeStr}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ</span>
-                        <span class="text-zinc-200">${radioOp}</span>
+                        <span class="text-zinc-200">${data.radioOp}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร</span>
-                        <span class="text-zinc-200">${clerk}</span>
+                        <span class="text-zinc-200">${data.clerk}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่</span>
-                        <span class="text-zinc-200">${guard}</span>
+                        <span class="text-zinc-200">${data.guard}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501</span>
-                        <span class="text-zinc-200">${pos501}</span>
+                        <span class="text-zinc-200">${data.pos501}</span>
                     </div>
                 `;
             } else {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> เชื่อมต่อสำเร็จ แต่อาจพิมพ์ชื่อเดือน/เลขวันไม่ตรงกันในแผ่นงาน</div>`;
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตาราง</div>`;
             }
-
         } catch (error) {
             console.error(error);
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ระบบเชื่อมข้อมูลขัดข้อง แต่อ่านตารางเต็มแถวด้านล่างได้ครับ</div>`;
+            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เชื่อมข้อมูลล้มเหลว แต่อ่านตารางรวมด้านล่างแทนได้ครับ</div>`;
         }
     }
 
