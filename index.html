@@ -745,16 +745,16 @@
         } finally { btn.disabled = false; btn.innerText = "ยืนยันส่งข้อมูล"; }
     }
 
-    window.addEventListener("load", function() {
+ window.addEventListener("load", function() {
         generateStaff();
         initSearchDropdown();
-        switchTab('home'); 
+        switchTab('home');
         document.getElementById('current-date').innerText = getThaiDate();
         const confirmBtn = document.getElementById('btnConfirmSend');
         if(confirmBtn) { confirmBtn.onclick = sendFinal; }
-    }); // 👈 ปิดโดมหลักที่ถูกต้อง (บรรทัด 752 เดิม)
+    });
 
-    // ฟังก์ชันค้นหาแบบระบุทั้ง "เดือน" และ "รหัสบุคคล" เพื่อรองรับเวรล่วงหน้า
+    // ฟังก์ชันค้นหาแบบระบุทั้ง "เดือน" และ "รหัสบุคคล"
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -767,10 +767,9 @@
             return;
         }
 
-        const selectedMonth = monthEl.value; // เช่น "มิถุนายน"
-        const targetId = staffEl.value;      // เช่น "2-2"
+        const selectedMonth = monthEl.value;
+        const targetId = staffEl.value;
         
-        // ค้นหาแท็บชีตที่มีชื่อตรงกับเดือนที่เลือก โดยดึงจากฐานข้อมูลหลัก globalAllSheetsData
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
         let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
 
@@ -779,20 +778,16 @@
 
         records.forEach(function(record) {
             let roles = [];
-            
-            // แปลงค่าจากชีตให้เป็นข้อความและตัดช่องว่างออก ป้องกันการค้นหาพลาด
             let radio = record.radioOp ? record.radioOp.toString().trim() : '';
             let clerk = record.clerk ? record.clerk.toString().trim() : '';
             let guard = record.guard ? record.guard.toString().trim() : '';
             let pos501 = record.pos501 ? record.pos501.toString().trim() : '';
 
-            // ตรวจหาตำแหน่งเวร (ใช้ includes เผื่อกรณีในช่องมีรหัสซ้อนกันหรือเคาะเว้นวรรค)
             if (radio.includes(targetId)) roles.push("พนักงานวิทยุ");
             if (clerk.includes(targetId)) roles.push("เสมียนเวร");
             if (guard.includes(targetId)) roles.push("รักษาสถานที่");
             if (pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
 
-            // ดึงข้อมูลขึ้นมาแสดงผลหากวันนั้นเข้าเวรจริง
             if (roles.length > 0) {
                 totalDays++;
                 htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
