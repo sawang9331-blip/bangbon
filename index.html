@@ -383,43 +383,53 @@
                 globalAllSheetsData = data.allSheetsData;
             }
 
-            if (data && data.found) {
-                function cleanValue(val) {
-                    if (!val) return '-';
-                    let str = val.toString().trim();
-                    if (str.match(/^\d{4}-\d{2}-\d{2}T/)) return "ไม่ระบุข้อมูล"; 
-                    return str;
+            // ค้นหาข้อมูลของวันปัจจุบันจากข้อมูลชีต
+            let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonthName));
+            let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
+            let todayRecord = records.find(r => parseInt(r.day) === day);
+
+            if (todayRecord) {
+                // ฟังก์ชันจับคู่หาว่ารหัสไหนได้เลขตำแหน่งอะไรในวันนี้
+                function findStaffForRole(roleNum) {
+                    let staffKeys = ['radioOp', 'clerk', 'guard', 'pos501', 'status'];
+                    let staffIds = ["2-2", "2-3", "2-4", "2-5", "2-6", "2-7"];
+                    
+                    let foundStaff = "-";
+                    staffIds.forEach((id, idx) => {
+                        if (todayRecord[staffKeys[idx]] == roleNum) {
+                            foundStaff = "บางบอน " + id;
+                        }
+                    });
+                    return foundStaff;
                 }
 
+                let currentStatus = todayRecord.status ? todayRecord.status.toString().trim() : 'ปกติ';
+
                 detailsContainer.innerHTML = `
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่</span>
-                        <span class="font-bold text-white text-base">${cleanValue(data.dutySet)}</span>
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่ประจำวัน</span>
+                        <span class="font-bold text-white text-base">ชุดเวร ${todayRecord.dutySet || '-'} (${currentStatus})</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-clock mr-1 text-yellow-400"></i> เวลาเข้าเวร / Status</span>
-                        <span class="font-bold text-amber-400">${cleanValue(data.timeStr)}</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
+                        <span class="text-zinc-200 font-bold text-base">${findStaffForRole(1)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ</span>
-                        <span class="text-zinc-200 font-bold">${cleanValue(data.radioOp)}</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
+                        <span class="text-zinc-200 font-bold text-base">${findStaffForRole(2)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร</span>
-                        <span class="text-zinc-200 font-bold">${cleanValue(data.clerk)}</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
+                        <span class="text-zinc-200 font-bold text-base">${findStaffForRole(3)}</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่</span>
-                        <span class="text-zinc-200 font-bold">${cleanValue(data.guard)}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501</span>
-                        <span class="text-zinc-200 font-bold">${cleanValue(data.pos501)}</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
+                        <span class="text-zinc-200 font-bold text-base">${findStaffForRole(4)}</span>
                     </div>
                 `;
-                searchIndividualDuty();
+                if(typeof searchIndividualDuty === "function") searchIndividualDuty();
             } else {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตาราง</div>`;
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตารางชีต</div>`;
             }
         } catch (error) {
             console.error(error);
