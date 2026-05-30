@@ -355,7 +355,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         if (tabId === 'schedule') fetchTodayDuty();
     }
 
-   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (สลับแท็บเดือนอัตโนมัติ)
+   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (สะอาดและไม่มีฟังก์ชันอื่นมาเกี่ยว)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -369,24 +369,22 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             const d = new Date();
             const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
             const currentMonth = thaiMonths[d.getMonth()];
-            const today = d.getDate(); // วันที่ปัจจุบัน (1-31)
+            const today = d.getDate(); 
             
-            // ค้นหาคีย์ชื่อแท็บที่มีคำว่า "พฤษภาคม" หรือ "มิถุนายน" ตามเดือนปัจจุบัน
+            // ค้นหาคีย์ชื่อแท็บที่มีคำว่าเดือนปัจจุบัน
             let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonth));
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                const colIndex = today; // คอลัมน์ที่ตรงกับวันที่
+                const colIndex = today; 
 
                 let dutyPositions = { radioOp: '-', clerk: '-', guard: '-', pos501: '-' };
 
-                // แถวที่ 1 ในตารางดึงมาเช็คหัวข้อ (แถวรายชื่อจะเริ่มจาก index 3 หรือ 4 เป็นต้นไป)
                 for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
                     if (!row || row.length === 0) continue;
                     
                     const staffName = row[0] ? row[0].toString().trim() : '';
-                    // ข้ามแถวที่ไม่ใช่รายชื่อเจ้าหน้าที่
                     if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ") || staffName.includes("หมายเหตุ")) continue;
 
                     const dutyType = row[colIndex] ? parseInt(row[colIndex]) : 0;
@@ -406,22 +404,21 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
                         <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioOp}</span>
                     </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                    <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
                         <span class="text-zinc-200 font-bold text-base">${dutyPositions.clerk}</span>
                     </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                    <div class="bg-zinc-800/60 p-2 rounded border border-green-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
                         <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
                     </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                    <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50">
                         <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
                         <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501}</span>
                     </div>
                 `;
                 if(badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
                 
-                if(typeof searchIndividualDuty === "function") searchIndividualDuty();
             } else {
                 detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบตารางของเดือน ${currentMonth} ในระบบ</div>`;
             }
@@ -433,7 +430,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
   
 
-    // 3. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
+    // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
