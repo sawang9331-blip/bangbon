@@ -320,6 +320,7 @@
     let currentMonthOffset = 0;
     let pendingData = null;
 
+    // ระบบสลับหน้าต่างแท็บเมนู
     function switchTab(tabId) {
         const tabs = document.querySelectorAll('.tab-content');
         tabs.forEach(tab => tab.style.display = 'none');
@@ -338,11 +339,13 @@
         }
     }
 
+    // ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน
     function changeMonth(offsetDirection) {
         currentMonthOffset += offsetDirection;
         renderMonthlySchedule();
     }
 
+    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
@@ -360,54 +363,48 @@
             labelEl.innerText = fullSheetName;
         }
 
-        // วาดตารางใหม่จากข้อมูลชีตที่โหลดมาตามเดือนที่เลือก
         if (containerEl) {
             if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
                 return;
             }
 
-            // ค้นหาแท็บข้อมูลที่ชื่อตรงกัน
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.trim() === fullSheetName.trim());
             
             if (targetKey && globalAllSheetsData[targetKey]) {
-                displaySheetTable(globalAllSheetsData[targetKey]);
+                displaySheetTable(globalAllSheetsData[targetKey]); // เรียกฟังก์ชันให้ชื่อตรงกัน
             } else {
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
             }
         }
     }
 
-    // ฟังก์ชันสร้างตาราง HTML ออกมาแสดงผลแบบ Dark Mode
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (แก้ไขชื่อฟังก์ชันเรียบร้อย)
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
 
-        let html = '<div class="overflow-x-auto"><table class="min-w-full border-collapse text-center" style="font-size: 11px;">';
+        let html = '<div class="overflow-x-auto"><table class="min-w-full border-collapse text-center" style="font-size: 11px; color: #e4e4e7;">';
         
         matrix.forEach((row, rowIndex) => {
-            // เช็คว่าเป็นแถวหัวข้อตารางหรือไม่ (3 แถวแรก)
             const isHeader = rowIndex < 4;
             html += `<tr class="${isHeader ? 'bg-zinc-800 text-amber-400 font-bold sticky top-0' : 'hover:bg-zinc-800/40 border-b border-zinc-800/60'}">`;
             
             row.forEach((cell, cellIndex) => {
                 const cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
                 
-                // ตกแต่งสไตล์ช่องตารางแยกตามประเภทข้อมูล
                 let bgStyle = '';
                 if (isHeader) {
                     bgStyle = 'border: 1px solid #3f3f46; padding: 6px 4px;';
                 } else {
                     bgStyle = 'border: 1px solid #27272a; padding: 6px 4px;';
-                    // ทำสีไฮไลต์สำหรับประเภทเวรยาม
-                    if (cellValue === '1') bgStyle += ' background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: bold;'; // วิทยุ
-                    if (cellValue === '2') bgStyle += ' background-color: rgba(168, 85, 247, 0.15); color: #c084fc; font-weight: bold;'; // เสมียน
-                    if (cellValue === '3') bgStyle += ' background-color: rgba(34, 197, 94, 0.15); color: #4ade80; font-weight: bold;';  // รักษาสถานที่
-                    if (cellValue === '4') bgStyle += ' background-color: rgba(249, 115, 22, 0.15); color: #fb923c; font-weight: bold;';  // 501
-                    if (cellValue === 'พ') bgStyle += ' color: #71717a;'; // เวรพัก
+                    if (cellValue === '1') bgStyle += ' background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: bold;'; 
+                    if (cellValue === '2') bgStyle += ' background-color: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold;'; 
+                    if (cellValue === '3') bgStyle += ' background-color: rgba(34, 197, 94, 0.2); color: #4ade80; font-weight: bold;';  
+                    if (cellValue === '4') bgStyle += ' background-color: rgba(249, 115, 22, 0.2); color: #fb923c; font-weight: bold;';  
+                    if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
                 }
                 
-                // ดันคอลัมน์ชื่อพนักงาน (คอลัมน์แรก) ให้ชิดซ้ายเพื่อให้อ่านง่าย
                 const textAlign = cellIndex === 0 ? 'text-left font-bold min-w-[90px] px-2' : 'text-center';
                 const tag = isHeader ? 'th' : 'td';
                 
@@ -419,6 +416,26 @@
         html += '</table></div>';
         container.innerHTML = html;
     }
+
+    function updateLivePreview(inputId, outputId) {
+        const inputEl = document.getElementById(inputId);
+        const outEl = document.getElementById(outputId);
+        if (inputEl && outEl) {
+            const val = inputEl.value;
+            outEl.innerText = val ? "ตรวจสอบ: " + val : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
+        }
+    }
+
+    async function fetchTodayDuty() {
+        const detailsContainer = document.getElementById('today-duty-details');
+        const badgeContainer = document.getElementById('today-date-badge');
+        
+        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
+            if (detailsContainer) {
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-zinc-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังโหลดข้อมูลตารางเวร...</div>`;
+            }
+            return;
+        }
 
         try {
             const d = new Date();
@@ -617,7 +634,7 @@
         }
     }
 
-   async function loadSheetsDataFromAppsScript() {
+    async function loadSheetsDataFromAppsScript() {
         try {
             const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
             if (!response.ok) throw new Error("Network error");
@@ -625,7 +642,7 @@
             if (data) {
                 globalAllSheetsData = data;
                 fetchTodayDuty();
-                renderMonthlySchedule(); // มั่นใจว่าโหลดมาปุ๊บวาดปั๊บ
+                renderMonthlySchedule(); // วาดตารางทันทีหลังจากดึงข้อมูลเสร็จ
             }
         } catch (error) {
             console.error(error);
@@ -642,7 +659,6 @@
         }
 
         loadSheetsDataFromAppsScript();
-        renderMonthlySchedule();
     });
 </script>
 </body>
