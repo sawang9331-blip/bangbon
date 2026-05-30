@@ -327,7 +327,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznOT34lwiQXbG6piy7V5wEyHkd2PXcGmk1iF2kUi3qC0It_SWn-xXdGY8dxsmZAkSR/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznOT34lwiQXbG6piy7V5wEyHkd2PXcGmk1iF2kUi3qC0It_SWn-xXdGY8dxsmZAkSR/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
@@ -349,19 +349,7 @@
         if (tabId === 'schedule') fetchTodayDuty();
     }
 
-    // ฟังก์ชันช่วยดึงชื่อเจ้าหน้าที่ตามรหัสบทบาทหน้าที่ (1-4)
-    function getStaffNameByRole(record, roleNum) {
-        if (!record) return '-';
-        switch(roleNum) {
-            case 1: return record.radioOp || record.radio || '-';
-            case 2: return record.clerk || '-';
-            case 3: return record.guard || '-';
-            case 4: return record.pos501 || '-';
-            default: return '-';
-        }
-    }
-
-    // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน
+    // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (แก้ไขจุด Error เรียบร้อย)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -391,22 +379,25 @@
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
-                            <span class="text-zinc-200 font-bold text-base">${getStaffNameByRole(todayRecord, 1)}</span>
+                            <span class="text-zinc-200 font-bold text-base">${todayRecord.radioOp || todayRecord.radio || '-'}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
-                            <span class="text-zinc-200 font-bold text-base">${getStaffNameByRole(todayRecord, 2)}</span>
+                            <span class="text-zinc-200 font-bold text-base">${todayRecord.clerk || '-'}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
-                            <span class="text-zinc-200 font-bold text-base">${getStaffNameByRole(todayRecord, 3)}</span>
+                            <span class="text-zinc-200 font-bold text-base">${todayRecord.guard || '-'}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
-                            <span class="text-zinc-200 font-bold text-base">${getStaffNameByRole(todayRecord, 4)}</span>
+                            <span class="text-zinc-200 font-bold text-base">${todayRecord.pos501 || '-'}</span>
                         </div>
                     `;
                     badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
+                    
+                    // เรียกอัปเดตช่องค้นหารายบุคคลพ่วงไปด้วย
+                    if(typeof searchIndividualDuty === "function") searchIndividualDuty();
                 } else {
                     detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตารางชีต</div>`;
                 }
@@ -651,7 +642,7 @@
             if (data) {
                 globalAllSheetsData = data;
                 console.log("โหลดข้อมูลตารางเวรรวมสำเร็จ:", Object.keys(globalAllSheetsData));
-                // หากกำลังเปิดแท็บตารางเวรอยู่ ให้เรียกแสดงผลทันทีหลังโหลดข้อมูลเสร็จ
+                // หากหน้าเว็บกำลังเปิดอยู่ที่แท็บตารางเวร ให้ประมวลผลแสดงข้อมูลทันที
                 const targetTab = document.getElementById('tab-schedule');
                 if (targetTab && targetTab.style.display === 'block') {
                     fetchTodayDuty();
