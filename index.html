@@ -349,14 +349,19 @@
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
+        const targetYearThai = d.getFullYear() + 543; // คำนวณปี พ.ศ. (เช่น 2569)
         
         if (labelEl) {
-            labelEl.innerText = targetMonthName + " " + (d.getFullYear() + 543);
+            labelEl.innerText = targetMonthName + " " + targetYearThai;
         }
 
         if (iframeEl) {
             const baseUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml";
-            iframeEl.src = baseUrl + "?sheet=" + encodeURIComponent(targetMonthName) + "&widget=false&headers=false&chrome=false";
+            
+            // รวมชื่อเดือนกับปี พ.ศ. ให้ตรงกับชื่อแท็บจริง (เช่น "มิถุนายน 2569")
+            const fullSheetName = targetMonthName + " " + targetYearThai; 
+            
+            iframeEl.src = baseUrl + "?sheet=" + encodeURIComponent(fullSheetName) + "&widget=false&headers=false&chrome=false";
         }
     }
 
