@@ -431,7 +431,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ปรับปรุงการค้นหาแถวข้อมูล)
+    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (แก้ไขการอ่านแนวคอลัมน์วันที่ให้ถูกต้อง)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -444,10 +444,10 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             return;
         }
 
-        const selectedMonth = monthEl.value; // ค่าจะเป็น เช่น "พฤษภาคม 2569"
-        const targetId = staffEl.value.trim(); // ค่าจะเป็น เช่น "บางบอน 2-2"
+        const selectedMonth = monthEl.value; // ค่าเช่น "พฤษภาคม 2569"
+        const targetId = staffEl.value.trim(); // ค่าเช่น "บางบอน 2-2"
         
-        // ค้นหาแท็บชีตที่มีชื่อเดือนตรงกัน
+        // ค้นหาคีย์ชื่อแท็บใน Google Sheets
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth.split(" ")[0]));
         if (!targetSheetName) {
             summaryEl.innerText = `ไม่พบข้อมูลตารางของเดือน [${selectedMonth}]`;
@@ -460,27 +460,29 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // วนลูปตรวจสอบทุกแถว ตั้งแต่แถวแรก (index 0) เพื่อไม่ให้พลาดข้อมูลรายชื่อใด ๆ
+        // 1. วนลูปหาแถวของเจ้าหน้าที่คนนั้น ๆ ในตาราง (เริ่มดูตั้งแต่แถว index ที่ 3 ลงไปเพื่อข้ามหัวตาราง)
         let staffRow = null;
         for (let i = 0; i < sheetMatrix.length; i++) {
             if (sheetMatrix[i] && sheetMatrix[i][0]) {
                 const currentNameInSheet = sheetMatrix[i][0].toString().trim();
                 if (currentNameInSheet === targetId) {
                     staffRow = sheetMatrix[i];
-                    break; // เจอแถวข้อมูลของคนนั้นแล้ว ให้หยุดลูปค้นหา
+                    break;
                 }
             }
         }
 
+        // 2. เมื่อเจอแถวแล้ว ให้เดินอ่านข้อมูลไปทางขวา (แนวนอน) ตามคอลัมน์วันที่ 1 ถึง 31
         if (staffRow) {
-            // ในตาราง คอลัมน์ index ที่ 1 คือวันที่ 1 ไปจนถึงคอลัมน์ index ที่ 31 คือวันที่ 31
             for (let day = 1; day <= 31; day++) {
-                if (day >= staffRow.length) break;
+                // คอลัมน์ที่ 1 ในตารางชีตของคุณคือวันที่ 1 ตรง ๆ เลย
+                const cellValue = staffRow[day];
+                if (cellValue === undefined || cellValue === null) continue;
                 
-                const dutyType = staffRow[day] ? parseInt(staffRow[day]) : 0;
+                const dutyType = parseInt(cellValue.toString().trim());
                 let roleName = "";
                 
-                // แปลงตัวเลขหน้าที่ในช่องตารางให้เป็นข้อความ
+                // ถอดรหัสตัวเลขในแนวนอน
                 if (dutyType === 1) roleName = "พนักงานวิทยุ (1)";
                 if (dutyType === 2) roleName = "เสมียนเวร (2)";
                 if (dutyType === 3) roleName = "รักษาสถานที่ (3)";
@@ -499,7 +501,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             }
         }
 
-        // อัปเดตข้อมูลจำนวนวันและรายการหน้าที่ขึ้นแสดงบนหน้าเว็บ
+        // 3. นำข้อมูลไปแสดงผลลัพธ์
         summaryEl.innerText = `${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
         listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบกำหนดการเข้าเวรในเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
