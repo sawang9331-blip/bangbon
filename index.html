@@ -327,7 +327,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznOT34lwiQXbG6piy7V5wEyHkd2PXcGmk1iF2kUi3qC0It_SWn-xXdGY8dxsmZAkSR/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XTH1dEbhJPs1kHYvv6AxBKxFhr9bPgsOLjpUH9jRto5iMArqI-Teueuu2oNXAlsu/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
@@ -636,20 +636,23 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznOT34lwiQXbG6
     // ฟังก์ชันดึงข้อมูลจาก Google Sheets Apps Script ติดตั้งเมื่อเปิดหน้าเว็บ
     async function loadSheetsDataFromAppsScript() {
         try {
-            const response = await fetch(APPS_SCRIPT_URL);
+            // เพิ่ม ?action=getData ต่อท้าย URL เพื่อเรียกขอข้อมูลตารางเวร
+            const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
             if (data) {
                 globalAllSheetsData = data;
                 console.log("โหลดข้อมูลตารางเวรรวมสำเร็จ:", Object.keys(globalAllSheetsData));
-                // หากหน้าเว็บกำลังเปิดอยู่ที่แท็บตารางเวร ให้ประมวลผลแสดงข้อมูลทันที
-                const targetTab = document.getElementById('tab-schedule');
-                if (targetTab && targetTab.style.display === 'block') {
-                    fetchTodayDuty();
-                }
+                
+                // สั่งให้ประมวลผลแสดงข้อมูลทันทีเมื่อโหลดเสร็จ
+                fetchTodayDuty();
             }
         } catch (error) {
             console.error("ผิดพลาดในการดึงตารางเวรจาก Apps Script:", error);
+            const detailsContainer = document.getElementById('today-duty-details');
+            if (detailsContainer) {
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ไม่สามารถเชื่อมต่อตารางเวรได้</div>`;
+            }
         }
     }
 
