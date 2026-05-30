@@ -312,14 +312,33 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2bKn0k86BDCWyWbSciceOSdudSJ_8VQIaJJAyis5RecfOuGRMECAPH/exec";
+    // 1. ประกาศตัวแปรและตั้งค่า URL ระบบหลังบ้าน
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2bKn0k86BDCWyWbSciceOSdudSJ_8VQIaJJAyis5RecfOuGRMECAPH/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
- 
-  // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
-    // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
+    
+    // กำหนดตัวแปรสำหรับเก็บข้อมูลตารางเวรทั้งหมดเป็น Global Object
+    let globalAllSheetsData = {}; 
     let currentMonthOffset = 0;
+    let pendingData = null;
 
+    // 2. ฟังก์ชันสลับแท็บหน้าเว็บ (เพิ่มกลับเข้าไปให้ครบถ้วน)
+    function switchTab(tabId) {
+        // ซ่อนทุกแท็บ
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        // เอาสถานะ active ออกจากทุกปุ่มกดด้านล่าง
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        
+        // แสดงแท็บที่เลือก
+        const targetTab = document.getElementById('tab-' + tabId);
+        if (targetTab) targetTab.classList.add('active');
+        
+        // ใส่สถานะ active ให้ปุ่มกดด้านล่างที่ตรงกับแท็บ
+        const targetNav = document.getElementById('nav-' + tabId);
+        if (targetNav) targetNav.classList.add('active');
+    }
+
+    // 3. ฟังก์ชันควบคุมการเปลี่ยนเดือนของตารางรวม
     function changeMonth(offsetDirection) {
         currentMonthOffset += offsetDirection;
         renderMonthlySchedule();
@@ -359,10 +378,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // หน่วงเวลาให้ระบบโหลดข้อมูลจากชีตให้เสร็จก่อน แล้วแสดงผลเดือนปัจจุบัน
-    setTimeout(renderMonthlySchedule, 2500);
-
-    // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
+    // 4. ฟังก์ชันแสดง Live Preview (รวมเหลืออันเดียว ไม่ซ้ำซ้อน)
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
@@ -376,10 +392,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // หน่วงเวลาให้ระบบโหลดข้อมูลจากชีตให้เสร็จก่อน แล้วแสดงผลเดือนปัจจุบันทันที
-    setTimeout(renderMonthlySchedule, 2500);
-
-   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (สะอาดและไม่มีฟังก์ชันอื่นมาเกี่ยว)
+    // 5. ฟังก์ชันคำนวณและแสดงเวรประจำวันปัจจุบัน
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -395,7 +408,6 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             const currentMonth = thaiMonths[d.getMonth()];
             const today = d.getDate(); 
             
-            // ค้นหาคีย์ชื่อแท็บที่มีคำว่าเดือนปัจจุบัน
             let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonth));
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
@@ -452,47 +464,19 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
-    function updateLivePreview(inputId, outputId) {
-        const inputEl = document.getElementById(inputId);
-        const outEl = document.getElementById(outputId);
-        if (inputEl && outEl) {
-            const val = inputEl.value;
-            if (val) {
-                outEl.innerText = "ตรวจสอบ: " + val;
-            } else {
-                outEl.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
-            }
-        }
-    }
-
+    // 6. ฟังก์ชันสร้างรายชื่อเจ้าหน้าที่ (แก้ไขส่วนที่หลุดและปีกกาเกินแล้ว)
     function generateStaff() {
-    let htmlTeam = '';
-    let htmlSend = '';
-    
-    for (let g = 1; g <= 4; g++) {
-        htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
-        htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
-        for (let i = 1; i <= 10; i++) {
-            const name = 'บางบอน ' + g + '-' + i;
-            htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
-            htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
-        }
-        htmlTeam += '</div>';
-        htmlSend += '</div>';
-    }
-    
-    const fTeam = document.getElementById('fire_team_list');
-    const rTeam = document.getElementById('res_team_list');
-    const fSend = document.getElementById('fire_sender_list');
-    const rSend = document.getElementById('res_sender_list');
-    
-    // เพิ่มการตรวจสอบตรงนี้: ถ้ามี id นั้นๆ อยู่บนหน้าเว็บ ถึงจะยอมใส่ข้อมูลเข้าไป
-    if (fTeam) fTeam.innerHTML = htmlTeam;
-    if (rTeam) rTeam.innerHTML = htmlTeam;
-    if (fSend) fSend.innerHTML = htmlSend;
-    if (rSend) rSend.innerHTML = htmlSend;
-}
+        let htmlTeam = '';
+        let htmlSend = '';
+        
+        for (let g = 1; g <= 4; g++) {
+            htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+            for (let i = 1; i <= 10; i++) {
+                const name = 'บางบอน ' + g + '-' + i;
+                htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
+                htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
+            }
             htmlTeam += '</div>';
             htmlSend += '</div>';
         }
@@ -501,19 +485,21 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         const rTeam = document.getElementById('res_team_list');
         const fSend = document.getElementById('fire_sender_list');
         const rSend = document.getElementById('res_sender_list');
-
-        if(fTeam) fTeam.innerHTML = htmlTeam;
-        if(rTeam) rTeam.innerHTML = htmlTeam;
-        if(fSend) fSend.innerHTML = htmlSend;
-        if(rSend) rSend.innerHTML = htmlSend;
+        
+        if (fTeam) fTeam.innerHTML = htmlTeam;
+        if (rTeam) rTeam.innerHTML = htmlTeam;
+        if (fSend) fSend.innerHTML = htmlSend;
+        if (rSend) rSend.innerHTML = htmlSend;
     }
 
+    // 7. ฟังก์ชันจัดการวันที่และเวลาของไทย
     function getThaiDate() {
         const d = new Date();
         const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         return "วันที่ " + d.getDate() + " " + m[d.getMonth()] + " " + (d.getFullYear() + 543);
     }
 
+    // 8. ฟังก์ชันเปิด-ปิด ช่องกรอก "เหตุอื่นๆ" ของการช่วยเหลือประชาชน
     function toggleOther() {
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
@@ -529,8 +515,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    let pendingData = null;
-
+    // 9. ฟังก์ชันจัดเตรียมรายงานก่อนส่งออก
     function prepareReport(type) {
         let text = "";
         let json = {};
@@ -579,6 +564,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
     function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
 
+    // 10. ฟังก์ชันส่งข้อมูลไปยังคลาวด์ (Supabase) และคัดลอกลงคลิปบอร์ด
     async function sendFinal() {
         if (!pendingData) return;
         const btn = document.getElementById('btnConfirmSend');
@@ -627,10 +613,9 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // ฟังก์ชันดึงข้อมูลจาก Google Sheets Apps Script ติดตั้งเมื่อเปิดหน้าเว็บ
+    // 11. ฟังก์ชันดึงข้อมูลจาก Google Sheets Apps Script
     async function loadSheetsDataFromAppsScript() {
         try {
-            // เพิ่ม ?action=getData ต่อท้าย URL เพื่อเรียกขอข้อมูลตารางเวร
             const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
@@ -638,8 +623,10 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
                 globalAllSheetsData = data;
                 console.log("โหลดข้อมูลตารางเวรรวมสำเร็จ:", Object.keys(globalAllSheetsData));
                 
-                // สั่งให้ประมวลผลแสดงข้อมูลทันทีเมื่อโหลดเสร็จ
+                // สั่งให้คำนวณและแสดงเวรวันนี้ทันที
                 fetchTodayDuty();
+                // แสดงตารางรวมเดือนปัจจุบัน
+                renderMonthlySchedule();
             }
         } catch (error) {
             console.error("ผิดพลาดในการดึงตารางเวรจาก Apps Script:", error);
@@ -650,16 +637,19 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // เริ่มต้นระบบเมื่อเปิดหน้าเว็บสำเร็จ
-   window.addEventListener("load", function() {
-    generateStaff();
-    switchTab('home');
-    
-    const dateEl = document.getElementById('current-date');
-    if (dateEl) {
-        dateEl.innerText = getThaiDate();
-    }
-});
+    // 12. เริ่มต้นระบบเมื่อหน้าเว็บโหลดเสร็จสิ้น
+    window.addEventListener("load", function() {
+        generateStaff();
+        switchTab('home');
+        
+        const dateEl = document.getElementById('current-date');
+        if (dateEl) {
+            dateEl.innerText = getThaiDate();
+        }
+
+        // เรียกดึงข้อมูลเวรจากสคริปต์ Google Sheets ทันทีที่เปิดแอป
+        loadSheetsDataFromAppsScript();
+    });
 </script>
 </body>
 </html>
