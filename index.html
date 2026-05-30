@@ -390,7 +390,7 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (ล็อกความกว้างช่องและล้างค่าขยะหัวข้อ)
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -598,10 +598,9 @@
         pendingData = { text: text, json: json };
         document.getElementById('previewBody').innerText = text;
         document.getElementById('previewOverlay').style.display = 'flex';
-        document.getElementById('btnConfirmSend').onclick = sendFinal;
     }
 
-   function closePreview() {
+    function closePreview() {
         document.getElementById('previewOverlay').style.display = 'none';
     }
 
@@ -646,12 +645,14 @@
             switchTab('home');
         } catch (err) {
             console.error(err);
-            alert("ระบบคัดลอกรายงานแล้ว นำไปวางในไลน์ได้เลยครับ!");
+            const hint = document.getElementById('copyHint');
+            if(hint) hint.classList.remove('hidden');
+            setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
             closePreview();
             switchTab('home');
         } finally {
             btn.disabled = false;
-            btn.innerText = "ยืนยันส่งข้อมูล";
+            btn.innerText = "ยืนยันการคัดลอก";
         }
     }
 
@@ -681,6 +682,6 @@
 
         loadSheetsDataFromAppsScript();
     });
-</script>    
+</script>   
 </body>
 </html>
