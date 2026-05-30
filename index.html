@@ -309,10 +309,13 @@
         </h3>
         <div id="previewBody" class="modal-body"></div>
         <div class="flex gap-3">
-            <button type="button" class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white cursor-pointer" onclick="closePreview()">กลับไปแก้ไข</button>
-            <button type="button" id="btnConfirmSend" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold text-sm text-white shadow-md cursor-pointer">ยืนยันส่งข้อมูล</button>
-        </div>
-    </div>
+    <button type="button" id="btnClosePreview" onclick="closePreview()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white cursor-pointer">
+        กลับไปแก้ไข
+    </button>
+    
+    <button type="button" id="btnConfirmSend" onclick="sendFinal()" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold text-sm text-white shadow-md cursor-pointer">
+        ยืนยันการคัดลอก
+    </button>
 </div>
 
 <div id="copyHint" class="fixed top-5 left-5 right-5 bg-green-600 text-white p-3 rounded-xl font-bold text-center z-50 shadow-xl hidden animate-bounce">
@@ -598,8 +601,8 @@
         document.getElementById('btnConfirmSend').onclick = sendFinal;
     }
 
-    function closePreview() { 
-        document.getElementById('previewOverlay').style.display = 'none'; 
+   function closePreview() {
+        document.getElementById('previewOverlay').style.display = 'none';
     }
 
     async function sendFinal() {
@@ -607,10 +610,8 @@
         const btn = document.getElementById('btnConfirmSend');
         btn.disabled = true;
         btn.innerText = "กำลังบันทึก...";
-        const text = pendingData.text;
-        const json = pendingData.json;
-
-        try {
+        // ... (ส่วนที่เหลือในบล็อกของพี่)
+    }
             await navigator.clipboard.writeText(text);
         } catch (e) {
             const el = document.createElement('textarea');
