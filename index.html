@@ -327,7 +327,7 @@
 </div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XTH1dEbhJPs1kHYvv6AxBKxFhr9bPgsOLjpUH9jRto5iMArqI-Teueuu2oNXAlsu/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2bKn0k86BDCWyWbSciceOSdudSJ_8VQIaJJAyis5RecfOuGRMECAPH/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
@@ -349,7 +349,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XTH1dEbhJPs1
         if (tabId === 'schedule') fetchTodayDuty();
     }
 
-    // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (แก้ไขจุด Error เรียบร้อย)
+   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (ปรับปรุงให้อ่านตารางสลับแกนตามชีตจริง)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -363,54 +363,68 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XTH1dEbhJPs1
             const d = new Date();
             const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
             const currentMonth = thaiMonths[d.getMonth()];
-            const today = d.getDate();
+            const today = d.getDate(); // วันที่ปัจจุบัน (1-31)
             
             let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonth));
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
-                let todayRecord = globalAllSheetsData[targetSheetName].find(r => parseInt(r.day) === today);
+                const sheetMatrix = globalAllSheetsData[targetSheetName];
                 
-                if (todayRecord) {
-                    let currentStatus = todayRecord.status ? todayRecord.status.toString().trim() : 'ปกติ';
+                // คอลัมน์ของวันที่ปัจจุบันในตาราง (วันที่ 1 จะอยู่ที่ Matrix คอลัมน์ index ที่ today)
+                // เนื่องจากคอลัมน์แรก (index 0) ในตารางของคุณคือ "รายชื่อ/วันที่"
+                const colIndex = today; 
 
-                    detailsContainer.innerHTML = `
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ชุดปฏิบัติหน้าที่ประจำวัน</span>
-                            <span class="font-bold text-white text-base">ชุดเวร ${todayRecord.dutySet || '-'} (${currentStatus})</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
-                            <span class="text-zinc-200 font-bold text-base">${todayRecord.radioOp || todayRecord.radio || '-'}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
-                            <span class="text-zinc-200 font-bold text-base">${todayRecord.clerk || '-'}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
-                            <span class="text-zinc-200 font-bold text-base">${todayRecord.guard || '-'}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
-                            <span class="text-zinc-200 font-bold text-base">${todayRecord.pos501 || '-'}</span>
-                        </div>
-                    `;
-                    badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
-                    
-                    // เรียกอัปเดตช่องค้นหารายบุคคลพ่วงไปด้วย
-                    if(typeof searchIndividualDuty === "function") searchIndividualDuty();
-                } else {
-                    detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบข้อมูลเวรของวันที่ปัจจุบันในตารางชีต</div>`;
+                let dutyPositions = { radioOp: '-', clerk: '-', guard: '-', pos501: '-' };
+                let dutySet = "-";
+
+                // วนลูปอ่านทุกแถวในตารางเพื่อจับคู่ว่าใครได้เลขอะไรในวันนี้
+                for (let i = 2; i < sheetMatrix.length; i++) {
+                    const row = sheetMatrix[i];
+                    const staffName = row[0] ? row[0].toString().trim() : '';
+                    if (!staffName || staffName === 'หมายเหตุ') continue;
+
+                    const dutyType = row[colIndex] ? parseInt(row[colIndex]) : 0;
+
+                    if (dutyType === 1) dutyPositions.radioOp = staffName;
+                    if (dutyType === 2) dutyPositions.clerk = staffName;
+                    if (dutyType === 3) dutyPositions.guard = staffName;
+                    if (dutyType === 4) dutyPositions.pos501 = staffName;
                 }
+
+                detailsContainer.innerHTML = `
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid =/users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
+                        <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
+                    </div>
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
+                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioOp}</span>
+                    </div>
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
+                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.clerk}</span>
+                    </div>
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
+                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
+                    </div>
+                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
+                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501}</span>
+                    </div>
+                `;
+                if(badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
+                
+                if(typeof searchIndividualDuty === "function") searchIndividualDuty();
             } else {
                 detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบตารางของเดือน ${currentMonth} ในระบบ</div>`;
             }
         } catch (error) {
             console.error(error);
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิดข้อผิดพลาดในการประมวลผลข้อมูลเวรวันนี้</div>`;
+            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิดข้อผิดพลาดในการคำนวณข้อมูลตารางเวร</div>`;
         }
     }
 
-    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า
+    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ปรับให้เข้ากับตารางสลับแกน)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -424,52 +438,52 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8XTH1dEbhJPs1
         }
 
         const selectedMonth = monthEl.value;
-        const targetId = staffEl.value.trim();
+        const targetId = staffEl.value.trim(); // เช่น "บางบอน 2-2"
         
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
-        let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
+        if (!targetSheetName) {
+            if (resultBox) resultBox.classList.add('hidden');
+            return;
+        }
 
+        const sheetMatrix = globalAllSheetsData[targetSheetName];
         let totalDays = 0;
         let htmlDetails = "";
 
-        records.forEach(function(record) {
-            let roles = [];
-            
-            function cleanText(val) {
-                if (!val) return '';
-                let s = val.toString().trim();
-                if (s.match(/^\d{4}-\d{2}-\d{2}T/)) return ''; 
-                return s;
+        // ค้นหาแถวของเจ้าหน้าที่คนนั้น ๆ
+        let staffRow = null;
+        for (let i = 2; i < sheetMatrix.length; i++) {
+            if (sheetMatrix[i][0] && sheetMatrix[i][0].toString().trim() === targetId) {
+                staffRow = sheetMatrix[i];
+                break;
             }
+        }
 
-            let radio = cleanText(record.radioOp || record.radio);
-            let clerk = cleanText(record.clerk);
-            let guard = cleanText(record.guard);
-            let pos501 = cleanText(record.pos501);
-            let statusStr = record.status ? record.status.toString().trim() : '';
-
-            if (radio.includes(targetId)) roles.push("พนักงานวิทยุ");
-            if (clerk.includes(targetId)) roles.push("เสมียนเวร");
-            if (guard.includes(targetId)) roles.push("รักษาสถานที่");
-            if (pos501.includes(targetId)) roles.push("ตำแหน่ง 501");
-
-            if (roles.length > 0 && !statusStr.includes("วันพัก")) {
-                totalDays++;
-                let displaySet = record.dutySet ? record.dutySet.toString().trim() : '-';
-                let displayStatus = statusStr || 'ปกติ';
+        if (staffRow) {
+            // วนลูปตั้งแต่วันที่ 1 ถึง 31 (ตามคอลัมน์ index ที่ 1 ถึง 31)
+            for (let day = 1; day <= 31; day++) {
+                const dutyType = staffRow[day] ? parseInt(staffRow[day]) : 0;
+                let roleName = "";
                 
-                htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
-                    <span class="text-zinc-300">📅 วันที่ ${record.day} ${selectedMonth} (ชุดเวร ${displaySet})</span>
-                    <div class="text-right">
-                        <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roles.join(', ')}</span>
-                        <span class="text-zinc-500 text-[10px] block mt-0.5">${displayStatus}</span>
-                    </div>
-                </div>`;
-            }
-        });
+                if (dutyType === 1) roleName = "พนักงานวิทยุ (1)";
+                if (dutyType === 2) roleName = "เสมียนเวร (2)";
+                if (dutyType === 3) roleName = "รักษาสถานที่ (3)";
+                if (dutyType === 4) roleName = "ตำแหน่ง 501 (4)";
 
-        summaryEl.innerText = `รหัส บางบอน ${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบรายชื่อในเวรเดือน ${selectedMonth}</div>`;
+                if (roleName) {
+                    totalDays++;
+                    htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
+                        <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth}</span>
+                        <div class="text-right">
+                            <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roleName}</span>
+                        </div>
+                    </div>`;
+                }
+            }
+        }
+
+        summaryEl.innerText = `${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
+        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบกำหนดการเข้าเวรในเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
     }
 
