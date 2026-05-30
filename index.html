@@ -441,14 +441,14 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
         if (!monthEl || !staffEl || !globalAllSheetsData) return;
 
-        const selectedMonth = monthEl.value.trim(); // เช่น "พฤษภาคม"
+        const selectedMonth = monthEl.value.trim(); // "พฤษภาคม"
         const targetId = staffEl.value.trim();
 
-        // **จุดแก้สำคัญ:** ค้นหาชีตที่ชื่อมีคำว่าเดือนนั้นอยู่ (ไม่ต้องตรงเป๊ะ)
-        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
+        // ค้นหาแบบเปรียบเทียบชื่อแท็บที่ตัดช่องว่างออกแล้ว
+        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.trim() === selectedMonth);
         
         if (!targetSheetName) {
-            summaryEl.innerText = "ไม่พบข้อมูลชีตของเดือน " + selectedMonth;
+            summaryEl.innerText = "ไม่พบชื่อแท็บชีตที่ชื่อว่า [" + selectedMonth + "]";
             resultBox.classList.remove('hidden');
             return;
         }
@@ -457,28 +457,30 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // วนลูปหาแถวเจ้าหน้าที่ (เริ่มจาก index 3 หรือแถวที่ 4 ในชีต)
+        // วนลูปเริ่มที่ index 3 (แถวที่ 4 ในชีต)
         for (let i = 3; i < sheetData.length; i++) {
             const row = sheetData[i];
-            // ตรวจสอบคอลัมน์แรกว่าเป็นชื่อรหัสตรงกันไหม
             if (row[0] && row[0].toString().trim() === targetId) {
-                // เจอแถวแล้ว วนลูปอ่านวันที่ 1-31 (คอลัมน์ 1-31)
+                // อ่านคอลัมน์ 1-31
                 for (let col = 1; col <= 31; col++) {
-                    const dutyType = parseInt(row[col]);
-                    if (dutyType >= 1 && dutyType <= 4) {
-                        totalDays++;
-                        const roleNames = ["", "พนักงานวิทยุ (1)", "เสมียนเวร (2)", "รักษาสถานที่ (3)", "ตำแหน่ง 501 (4)"];
-                        htmlDetails += `<div class="p-2 border-b border-zinc-800 flex justify-between text-xs">
-                            <span class="text-zinc-300">📅 วันที่ ${col} ${selectedMonth}</span>
-                            <span class="text-amber-400 font-semibold">${roleNames[dutyType]}</span>
-                        </div>`;
+                    const val = row[col];
+                    if (val) {
+                        const dutyType = parseInt(val.toString().trim());
+                        if (dutyType >= 1 && dutyType <= 4) {
+                            totalDays++;
+                            const roleNames = ["", "พนักงานวิทยุ (1)", "เสมียนเวร (2)", "รักษาสถานที่ (3)", "ตำแหน่ง 501 (4)"];
+                            htmlDetails += `<div class="p-2 border-b border-zinc-800 flex justify-between text-xs">
+                                <span class="text-zinc-300">📅 วันที่ ${col}</span>
+                                <span class="text-amber-400 font-semibold">${roleNames[dutyType]}</span>
+                            </div>`;
+                        }
                     }
                 }
                 break;
             }
         }
 
-        summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวรทั้งหมด: " + totalDays + " วัน";
+        summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวร: " + totalDays + " วัน";
         listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีรายการเวรในเดือนนี้</div>`;
         resultBox.classList.remove('hidden');
     }
