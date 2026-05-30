@@ -379,25 +379,34 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (แก้ไขชื่อฟังก์ชันเรียบร้อย)
+  // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (เวอร์ชันล็อกความกว้างช่องวันที่ให้เท่ากัน)
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
 
-        let html = '<div class="overflow-x-auto"><table class="min-w-full border-collapse text-center" style="font-size: 11px; color: #e4e4e7;">';
+        let html = '<div class="overflow-x-auto"><table class="table-layout-fixed min-w-full border-collapse text-center" style="font-size: 11px; color: #e4e4e7;">';
         
         matrix.forEach((row, rowIndex) => {
             const isHeader = rowIndex < 4;
             html += `<tr class="${isHeader ? 'bg-zinc-800 text-amber-400 font-bold sticky top-0' : 'hover:bg-zinc-800/40 border-b border-zinc-800/60'}">`;
             
             row.forEach((cell, cellIndex) => {
-                const cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
+                let cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
                 
+                // 🔥 จุดสำคัญ: ถ้าเป็นแถวตัวเลขวันที่ ( cellIndex > 0 ) แล้วมีข้อความยาวเกิน 2 ตัวอักษร (เช่น ชื่อเดือนหลุดมา) ให้ตัดทิ้งหรือเอาเฉพาะตัวเลข
+                if (cellIndex > 0 && cellValue.length > 2) {
+                    // ดึงเอาเฉพาะตัวเลขที่เจอล่าสุด หรือถ้าไม่มีตัวเลขให้ปล่อยว่าง
+                    const matchNumber = cellValue.match(/\d+/);
+                    cellValue = matchNumber ? matchNumber[0] : '';
+                }
+
                 let bgStyle = '';
                 if (isHeader) {
-                    bgStyle = 'border: 1px solid #3f3f46; padding: 6px 4px;';
+                    // ล็อกความกว้างช่องวันที่ให้กว้างช่องละ 35px เท่ากันทั้งหมด ไม่ให้โดนเบียด
+                    const widthStyle = cellIndex === 0 ? 'min-w-[95px] w-[95px]' : 'min-w-[35px] w-[35px]';
+                    bgStyle = `border: 1px solid #3f3f46; padding: 6px 2px; ${widthStyle};`;
                 } else {
-                    bgStyle = 'border: 1px solid #27272a; padding: 6px 4px;';
+                    bgStyle = 'border: 1px solid #27272a; padding: 6px 2px;';
                     if (cellValue === '1') bgStyle += ' background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; font-weight: bold;'; 
                     if (cellValue === '2') bgStyle += ' background-color: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold;'; 
                     if (cellValue === '3') bgStyle += ' background-color: rgba(34, 197, 94, 0.2); color: #4ade80; font-weight: bold;';  
@@ -405,7 +414,7 @@
                     if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
                 }
                 
-                const textAlign = cellIndex === 0 ? 'text-left font-bold min-w-[90px] px-2' : 'text-center';
+                const textAlign = cellIndex === 0 ? 'text-left font-bold px-2 sticky left-0 bg-zinc-900 z-10' : 'text-center';
                 const tag = isHeader ? 'th' : 'td';
                 
                 html += `<${tag} class="${textAlign}" style="${bgStyle}">${cellValue}</${tag}>`;
