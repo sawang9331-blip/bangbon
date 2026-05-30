@@ -433,86 +433,58 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (แก้ไขจุดตรวจสอบชื่อแท็บเดือนให้ตรงกัน 100%)
     function searchIndividualDuty() {
-        const monthEl = document.getElementById('search-month-select');
-        const staffEl = document.getElementById('search-staff-id');
-        const resultBox = document.getElementById('individual-result');
-        const summaryEl = document.getElementById('ind-summary');
-        const listEl = document.getElementById('ind-details-list');
+    const monthEl = document.getElementById('search-month-select');
+    const staffEl = document.getElementById('search-staff-id');
+    const resultBox = document.getElementById('individual-result');
+    const summaryEl = document.getElementById('ind-summary');
+    const listEl = document.getElementById('ind-details-list');
+
+    if (!monthEl || !staffEl || !globalAllSheetsData) return;
+
+    const selectedMonth = monthEl.value.trim();
+    const targetId = staffEl.value.trim();
+
+    const sheetData = globalAllSheetsData[selectedMonth];
+    if (!sheetData) {
+        summaryEl.innerText = "ไม่พบข้อมูลเดือน " + selectedMonth;
+        resultBox.classList.remove('hidden');
+        return;
+    }
+
+    let totalDays = 0;
+    let htmlDetails = "";
+
+    // ปรับให้เริ่มอ่านจาก index 3 ซึ่งคือแถวที่ 4 ใน Google ชีต (แถวชื่อรหัสแรก)
+    for (let i = 3; i < sheetData.length; i++) {
+        const row = sheetData[i];
         
-        if (!monthEl || !staffEl || !staffEl.value || !globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-            if (resultBox) resultBox.classList.add('hidden');
-            return;
-        }
-
-        const selectedMonth = monthEl.value.trim(); // ดึงค่าเต็ม เช่น "พฤษภาคม 2569"
-        const targetId = staffEl.value.trim();     // ดึงค่ารหัส เช่น "บางบอน 2-3"
-        
-        // ค้นหาคีย์ชื่อแท็บแบบตรงตัว (เช่น หาแท็บที่ชื่อ "พฤษภาคม 2569" หรือ "มิถุนายน 2569")
-        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.trim() === selectedMonth);
-        
-        // ถ้าระบบยังหาไม่เจอ ให้ลองหาแบบคำย่อยสั้น ๆ รองรับไว้เผื่อเหนียวครับ
-        if (!targetSheetName) {
-            targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth.split(" ")[0]));
-        }
-
-        if (!targetSheetName) {
-            summaryEl.innerText = `ไม่พบข้อมูลตารางของเดือน [${selectedMonth}]`;
-            listEl.innerHTML = `<div class="text-zinc-500 p-2 text-center">ไม่มีแท็บชีตเดือน ${selectedMonth} ในระบบ</div>`;
-            resultBox.classList.remove('hidden');
-            return;
-        }
-
-        const sheetMatrix = globalAllSheetsData[targetSheetName];
-        let totalDays = 0;
-        let htmlDetails = "";
-
-        // 1. วนลูปหาแถวข้อมูลของเจ้าหน้าที่คนนั้น ๆ (เริ่มดูตั้งแต่แถวแรกเพื่อไม่ให้พลาด)
-        let staffRow = null;
-        for (let i = 0; i < sheetMatrix.length; i++) {
-            if (sheetMatrix[i] && sheetMatrix[i][0]) {
-                const currentNameInSheet = sheetMatrix[i][0].toString().trim();
-                if (currentNameInSheet === targetId) {
-                    staffRow = sheetMatrix[i];
-                    break;
-                }
-            }
-        }
-
-        // 2. เมื่อเจอแถวแล้ว ให้เดินอ่านคอลัมน์แนวนอนจากวันที่ 1 ถึง 31
-        if (staffRow) {
-            for (let day = 1; day <= 31; day++) {
-                if (day >= staffRow.length) break;
+        // เช็คว่าชื่อในคอลัมน์แรกตรงกับที่เลือกไหม
+        if (row[0] && row[0].toString().trim() === targetId) {
+            
+            // วนลูปอ่านคอลัมน์วันที่ 1 ถึง 31 (ตรงกับ index 1 ถึง 31 ในอาเรย์)
+            for (let col = 1; col <= 31; col++) {
+                const val = row[col];
+                // แปลงค่าเป็นตัวเลขเพื่อเช็คหน้าที่ (1, 2, 3, 4)
+                const dutyType = parseInt(val);
                 
-                const cellValue = staffRow[day];
-                if (cellValue === undefined || cellValue === null) continue;
-                
-                const dutyType = parseInt(cellValue.toString().trim());
-                let roleName = "";
-                
-                // ถอดรหัสตัวเลขหน้าที่ในช่องตารางแนวนอน
-                if (dutyType === 1) roleName = "พนักงานวิทยุ (1)";
-                if (dutyType === 2) roleName = "เสมียนเวร (2)";
-                if (dutyType === 3) roleName = "รักษาสถานที่ (3)";
-                if (dutyType === 4) roleName = "ตำแหน่ง 501 (4)";
-
-                if (roleName) {
+                if (dutyType >= 1 && dutyType <= 4) {
                     totalDays++;
+                    const roleNames = ["", "พนักงานวิทยุ (1)", "เสมียนเวร (2)", "รักษาสถานที่ (3)", "ตำแหน่ง 501 (4)"];
                     htmlDetails += `
-                        <div class="p-2 border-b border-zinc-800 flex justify-between items-center text-xs">
-                            <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth.split(" ")[0]}</span>
-                            <div class="text-right">
-                                <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roleName}</span>
-                            </div>
+                        <div class="p-2 border-b border-zinc-800 flex justify-between text-xs">
+                            <span class="text-zinc-300">📅 วันที่ ${col}</span>
+                            <span class="text-amber-400 font-semibold">${roleNames[dutyType]}</span>
                         </div>`;
                 }
             }
+            break; // เจอคนแล้ว หยุดค้นหา
         }
-
-        // 3. อัปเดตข้อมูลขึ้นหน้าจอเว็บ
-        summaryEl.innerText = `${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบกำหนดการเข้าเวรในเดือน ${selectedMonth}</div>`;
-        resultBox.classList.remove('hidden');
     }
+
+    summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวรทั้งหมด: " + totalDays + " วัน";
+    listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีรายการเวรในเดือนนี้</div>`;
+    resultBox.classList.remove('hidden');
+}
 
     // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
     function updateLivePreview(inputId, outputId) {
