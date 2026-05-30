@@ -327,81 +327,104 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxjBUl0Nt_NMRO1GWKUe3JV1jGvj9Tg0J5RhiK2niDJSfSovsyIY6m4ULb1LWGCxgDT/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznOT34lwiQXbG6piy7V5wEyHkd2PXcGmk1iF2kUi3qC0It_SWn-xXdGY8dxsmZAkSR/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
     let globalAllSheetsData = {}; 
 
-    function switchTab(tabId) {
-        const contents = document.querySelectorAll('.tab-content');
-        const navs = document.querySelectorAll('.nav-item');
-        
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].style.display = 'none';
-            contents[i].classList.remove('active');
-        }
-        for (let j = 0; j < navs.length; j++) {
-            navs[j].classList.remove('active');
-        }
-        
-        const targetTab = document.getElementById('tab-' + tabId);
-        const targetNav = document.getElementById('nav-' + tabId);
-        
-        if (targetTab) {
-            targetTab.style.display = 'block';
-            targetTab.classList.add('active');
-        }
-        if (targetNav) {
-            targetNav.classList.add('active');
-        }
-        
-        window.scrollTo(0, 0);
+    // ส่วนนี้ให้วางแทนที่บรรทัดที่ 334-364 ใน index.html
+function switchTab(tabId) {
+    const contents = document.querySelectorAll('.tab-content');
+    const navs = document.querySelectorAll('.nav-item');
 
-        if (tabId === 'schedule') {
-            fetchTodayDuty();
-        }
+    contents.forEach(c => {
+        c.style.display = 'none';
+        c.classList.remove('active');
+    });
+    navs.forEach(n => n.classList.remove('active'));
+
+    const targetTab = document.getElementById('tab-' + tabId);
+    const targetNav = document.getElementById('nav-' + tabId);
+
+    if (targetTab) {
+        targetTab.style.display = 'block';
+        targetTab.classList.add('active');
+    }
+    if (targetNav) {
+        targetNav.classList.add('active');
     }
 
-    async function fetchTodayDuty() {
-        const detailsContainer = document.getElementById('today-duty-details');
-        const badgeContainer = document.getElementById('today-date-badge');
+    window.scrollTo(0, 0);
+
+    // เรียกฟังก์ชันเมื่อเปลี่ยนแท็บ
+    if (tabId === 'schedule') {
+        fetchTodayDuty();
+    }
+}
+
+   // แทนที่ฟังก์ชัน switchTab และ fetchTodayDuty เดิมด้วยชุดนี้ครับ
+function switchTab(tabId) {
+    const contents = document.querySelectorAll('.tab-content');
+    const navs = document.querySelectorAll('.nav-item');
+
+    contents.forEach(c => {
+        c.style.display = 'none';
+        c.classList.remove('active');
+    });
+    navs.forEach(n => n.classList.remove('active'));
+
+    const targetTab = document.getElementById('tab-' + tabId);
+    const targetNav = document.getElementById('nav-' + tabId);
+
+    if (targetTab) {
+        targetTab.style.display = 'block';
+        targetTab.classList.add('active');
+    }
+    if (targetNav) {
+        targetNav.classList.add('active');
+    }
+
+    window.scrollTo(0, 0);
+
+    if (tabId === 'schedule') {
+        fetchTodayDuty();
+    }
+}
+
+async function fetchTodayDuty() {
+    console.log("กำลังโหลดข้อมูลเวร...");
+    const detailsContainer = document.getElementById('today-duty-details');
+    const badgeContainer = document.getElementById('today-date-badge');
+    
+    if (typeof globalData === 'undefined') {
+        detailsContainer.innerHTML = "รอข้อมูลโหลด...";
+        return;
+    }
+
+    const d = new Date();
+    const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
+                        "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const currentMonth = thaiMonths[d.getMonth()];
+    
+    if (globalData[currentMonth]) {
+        const today = d.getDate();
+        const todayData = globalData[currentMonth].find(r => parseInt(r.date) === today);
         
-        const d = new Date();
-        const day = d.getDate();
-        const fullYearTh = d.getFullYear() + 543;
-        const thaiMonthsFull = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const currentMonthName = thaiMonthsFull[d.getMonth()];
-        
-        if(badgeContainer) badgeContainer.innerText = day + " " + currentMonthName + " " + fullYearTh;
-
-        try {
-            const response = await fetch(APPS_SCRIPT_URL);
-            const data = await response.json();
-
-            if(data && data.allSheetsData) {
-                globalAllSheetsData = data.allSheetsData;
-            }
-
-            // ค้นหาข้อมูลของวันปัจจุบันจากข้อมูลชีต
-            let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonthName));
-            let records = targetSheetName ? globalAllSheetsData[targetSheetName] : [];
-            let todayRecord = records.find(r => parseInt(r.day) === day);
-
-            if (todayRecord) {
-                // ฟังก์ชันจับคู่หาว่ารหัสไหนได้เลขตำแหน่งอะไรในวันนี้
-                function findStaffForRole(roleNum) {
-                    let staffKeys = ['radioOp', 'clerk', 'guard', 'pos501', 'status'];
-                    let staffIds = ["2-2", "2-3", "2-4", "2-5", "2-6", "2-7"];
-                    
-                    let foundStaff = "-";
-                    staffIds.forEach((id, idx) => {
-                        if (todayRecord[staffKeys[idx]] == roleNum) {
-                            foundStaff = "บางบอน " + id;
-                        }
-                    });
-                    return foundStaff;
-                }
+        if (todayData) {
+            detailsContainer.innerHTML = `
+                <div class="p-4 bg-zinc-800 rounded-xl text-white">
+                    <p>วิทยุ: ${todayData.duty1 || '-'}</p>
+                    <p>เสมียน: ${todayData.duty2 || '-'}</p>
+                    <p>รักษาสถานที่: ${todayData.duty3 || '-'}</p>
+                    <p>501: ${todayData.duty4 || '-'}</p>
+                </div>`;
+            badgeContainer.innerText = `เวรปฏิบัติหน้าที่ประจำวันที่ ${today} ${currentMonth}`;
+        } else {
+            detailsContainer.innerHTML = "ไม่พบข้อมูลเวรของวันนี้";
+        }
+    }
+}
 
                 let currentStatus = todayRecord.status ? todayRecord.status.toString().trim() : 'ปกติ';
 
