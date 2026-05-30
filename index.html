@@ -137,8 +137,9 @@
                 <div><span class="text-xs text-zinc-400">ว.10 หน้างาน</span><input type="time" id="f_t3"></div>
                 <div><span class="text-xs text-zinc-400">เลิก ว.10</span><input type="time" id="f_t4"></div>
             </div>
-            <div class="mt-2"><span class="text-xs text-zinc-400">ว.10 กลับถึง ส.ดพ.</span><input type="time" id="f_t5"></div>
-        </div>
+        <!-- ของเดิมลบออก แล้วสลับใส่ไอดีเพิ่มเข้าไปแบบนี้ครับ -->
+<div class="w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 420px);">
+   <iframe id="sheet-iframe" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml?widget=false&amp;headers=false&amp;chrome=false" class="w-full h-full border-0 bg-white"></iframe>
         
         <div>
             <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
@@ -346,38 +347,25 @@
 
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
-        const tableContainer = document.getElementById('sheet-data-container'); 
+        const iframeEl = document.getElementById('sheet-iframe'); // เปลี่ยนมาคุม iframe แทน
         
-        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) return;
-
         const d = new Date();
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
         
-        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(targetMonthName));
-
+        // 1. อัปเดตตัวหนังสือแสดงเดือนบนหน้าเว็บ
         if (labelEl) {
             labelEl.innerText = targetMonthName + " " + (d.getFullYear() + 543);
         }
 
-        if (targetSheetName && globalAllSheetsData[targetSheetName]) {
-            const sheetMatrix = globalAllSheetsData[targetSheetName];
-            if (typeof displaySheetData === "function") {
-                displaySheetData(sheetMatrix); 
-            }
-        } else {
-            if (tableContainer) {
-                tableContainer.innerHTML = `
-                    <div class="text-center py-8 text-zinc-500 bg-zinc-900/50 rounded-xl border border-zinc-800 col-span-2 w-full">
-                        <i class="fa-solid fa-folder-open block text-xl mb-2 text-zinc-600"></i>
-                        ไม่มีข้อมูลตารางเวรของเดือน ${targetMonthName} ในระบบคลาวด์
-                    </div>`;
-            }
+        // 2. สั่งให้ iframe โดดไปดึงแท็บตามชื่อเดือนนั้นๆ บน Google Sheets
+        if (iframeEl) {
+            const baseUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml";
+            iframeEl.src = baseUrl + "?sheet=" + encodeURIComponent(targetMonthName) + "&widget=false&headers=false&chrome=false";
         }
     }
-
     // 4. ฟังก์ชันแสดง Live Preview (รวมเหลืออันเดียว ไม่ซ้ำซ้อน)
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
