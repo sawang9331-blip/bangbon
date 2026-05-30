@@ -317,6 +317,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
 
    // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
+    // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
     let currentMonthOffset = 0;
 
     function changeMonth(offsetDirection) {
@@ -326,19 +327,21 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
-        const tableContainer = document.getElementById('duty-table-container') || document.getElementById('sheet-data-container');
+        const tableContainer = document.getElementById('sheet-data-container'); 
         
         if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) return;
 
+        // คำนวณหาชื่อเดือนเป้าหมาย
         const d = new Date();
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
         
-        // ค้นหาแท็บชีตที่มีคำว่า พฤษภาคม หรือ มิถุนายน
+        // วิ่งหาชื่อแท็บใน Google Sheets เช่น "พฤษภาคม 2569" หรือ "มิถุนายน 2569"
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(targetMonthName));
 
+        // แสดงชื่อเดือนและปี พ.ศ. บนปุ่มกด
         if (labelEl) {
             labelEl.innerText = targetMonthName + " " + (d.getFullYear() + 543);
         }
@@ -346,25 +349,23 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         if (targetSheetName && globalAllSheetsData[targetSheetName]) {
             const sheetMatrix = globalAllSheetsData[targetSheetName];
             
-            // เรียกฟังก์ชันหลักเพื่อวาดตารางใหม่ให้เปลี่ยนตามเดือน
-            if (typeof displayDutyTable === "function") {
-                displayDutyTable(sheetMatrix); 
-            } else if (typeof displaySheetData === "function") {
-                displaySheetData(sheetMatrix);
+            // เรียกฟังก์ชันหลักในเว็บของคุณเพื่อวาดโครงสร้างตารางใหม่ลงหน้าเว็บ
+            if (typeof displaySheetData === "function") {
+                displaySheetData(sheetMatrix); 
             }
         } else {
             if (tableContainer) {
                 tableContainer.innerHTML = `
-                    <div class="text-center py-8 text-zinc-500 bg-zinc-900/50 rounded-xl border border-zinc-800">
+                    <div class="text-center py-8 text-zinc-500 bg-zinc-900/50 rounded-xl border border-zinc-800 col-span-2 w-full">
                         <i class="fa-solid fa-folder-open block text-xl mb-2 text-zinc-600"></i>
-                        ไม่มีข้อมูลตารางเวรของเดือน ${targetMonthName} ในระบบคลาวด์
+                        ไม่มีข้อมูลตารางเวรของเดือน ${targetMonthName} ในคลาวด์
                     </div>`;
-                }
+            }
         }
     }
 
-    // สั่งให้ทำงานหลังจากโหลดข้อมูล
-    setTimeout(renderMonthlySchedule, 2000);
+    // หน่วงเวลาให้ระบบโหลดข้อมูลจากชีตให้เสร็จก่อน แล้วแสดงผลเดือนปัจจุบันทันที
+    setTimeout(renderMonthlySchedule, 2500);
 
    // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (สะอาดและไม่มีฟังก์ชันอื่นมาเกี่ยว)
     async function fetchTodayDuty() {
