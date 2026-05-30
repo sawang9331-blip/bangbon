@@ -425,7 +425,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ดึงตามเดือนที่ผู้ใช้เลือกใน Dropdown)
+    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (แก้ไขให้คำนวณวันเข้าเวรได้ถูกต้อง)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -438,9 +438,10 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             return;
         }
 
-        const selectedMonth = monthEl.value; // ค่าที่เลือก เช่น "พฤษภาคม" หรือ "มิถุนายน"
-        const targetId = staffEl.value.trim(); // รหัสที่ค้นหา เช่น "บางบอน 2-2"
+        const selectedMonth = monthEl.value; // เช่น "พฤษภาคม"
+        const targetId = staffEl.value.trim(); // เช่น "บางบอน 2-2"
         
+        // ค้นหาแท็บชีตที่มีชื่อเดือนตรงกัน
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
         if (!targetSheetName) {
             summaryEl.innerText = `ไม่พบข้อมูลตารางของเดือน [${selectedMonth}]`;
@@ -453,21 +454,24 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // วนลูปหาแถวของเจ้าหน้าที่คนนั้นในเดือนที่เลือก
+        // วนลูปหาแถวที่มีชื่อรหัสเจ้าหน้าที่ตรงกับที่เลือก
         let staffRow = null;
         for (let i = 0; i < sheetMatrix.length; i++) {
-            if (sheetMatrix[i][0] && sheetMatrix[i][0].toString().trim() === targetId) {
+            if (sheetMatrix[i] && sheetMatrix[i][0] && sheetMatrix[i][0].toString().trim() === targetId) {
                 staffRow = sheetMatrix[i];
                 break;
             }
         }
 
         if (staffRow) {
-            // ไล่เช็คทีละคอลัมน์ตั้งแต่วันที่ 1 ถึง 31
+            // ในตารางของคุณ คอลัมน์ที่ 1 คือวันที่ 1 ไปจนถึงคอลัมน์ที่ 31 คือวันที่ 31
             for (let day = 1; day <= 31; day++) {
+                if (day >= staffRow.length) break; // ป้องกันกรณีข้อมูลคอลัมน์ไม่ครบ
+                
                 const dutyType = staffRow[day] ? parseInt(staffRow[day]) : 0;
                 let roleName = "";
                 
+                // ถอดรหัสตัวเลขเป็นชื่อหน้าที่ตามเงื่อนไขของสถานี
                 if (dutyType === 1) roleName = "พนักงานวิทยุ (1)";
                 if (dutyType === 2) roleName = "เสมียนเวร (2)";
                 if (dutyType === 3) roleName = "รักษาสถานที่ (3)";
@@ -475,16 +479,18 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
                 if (roleName) {
                     totalDays++;
-                    htmlDetails += `<div class="p-1.5 border-b border-zinc-800 flex justify-between items-center text-xs">
-                        <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth}</span>
-                        <div class="text-right">
-                            <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roleName}</span>
-                        </div>
-                    </div>`;
+                    htmlDetails += `
+                        <div class="p-2 border-b border-zinc-800 flex justify-between items-center text-xs">
+                            <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth}</span>
+                            <div class="text-right">
+                                <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roleName}</span>
+                            </div>
+                        </div>`;
                 }
             }
         }
 
+        // แสดงผลลัพธ์ที่คำนวณได้จริงบนหน้าจอ
         summaryEl.innerText = `${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
         listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบกำหนดการเข้าเวรในเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
