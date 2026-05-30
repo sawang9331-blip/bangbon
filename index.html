@@ -610,13 +610,17 @@
         const btn = document.getElementById('btnConfirmSend');
         btn.disabled = true;
         btn.innerText = "กำลังบันทึก...";
-        // ... (ส่วนที่เหลือในบล็อกของพี่)
-    }
+        const text = pendingData.text;
+        const json = pendingData.json;
+
+        try {
             await navigator.clipboard.writeText(text);
         } catch (e) {
             const el = document.createElement('textarea');
-            el.value = text; document.body.appendChild(el);
-            el.select(); document.execCommand('copy');
+            el.value = text; 
+            document.body.appendChild(el);
+            el.select(); 
+            document.execCommand('copy');
             document.body.removeChild(el);
         }
 
@@ -642,9 +646,7 @@
             switchTab('home');
         } catch (err) {
             console.error(err);
-            const hint = document.getElementById('copyHint');
-            if(hint) hint.classList.remove('hidden');
-            setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
+            alert("ระบบคัดลอกรายงานแล้ว นำไปวางในไลน์ได้เลยครับ!");
             closePreview();
             switchTab('home');
         } finally {
