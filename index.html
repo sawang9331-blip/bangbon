@@ -315,8 +315,8 @@
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2bKn0k86BDCWyWbSciceOSdudSJ_8VQIaJJAyis5RecfOuGRMECAPH/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
-
-   // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
+ 
+  // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
     // ระบบควบคุมการเปลี่ยนเดือนของตารางรวมด้านล่าง
     let currentMonthOffset = 0;
 
@@ -331,25 +331,20 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         
         if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) return;
 
-        // คำนวณหาชื่อเดือนเป้าหมาย
         const d = new Date();
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
         
-        // วิ่งหาชื่อแท็บใน Google Sheets เช่น "พฤษภาคม 2569" หรือ "มิถุนายน 2569"
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(targetMonthName));
 
-        // แสดงชื่อเดือนและปี พ.ศ. บนปุ่มกด
         if (labelEl) {
             labelEl.innerText = targetMonthName + " " + (d.getFullYear() + 543);
         }
 
         if (targetSheetName && globalAllSheetsData[targetSheetName]) {
             const sheetMatrix = globalAllSheetsData[targetSheetName];
-            
-            // เรียกฟังก์ชันหลักในเว็บของคุณเพื่อวาดโครงสร้างตารางใหม่ลงหน้าเว็บ
             if (typeof displaySheetData === "function") {
                 displaySheetData(sheetMatrix); 
             }
@@ -358,8 +353,25 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
                 tableContainer.innerHTML = `
                     <div class="text-center py-8 text-zinc-500 bg-zinc-900/50 rounded-xl border border-zinc-800 col-span-2 w-full">
                         <i class="fa-solid fa-folder-open block text-xl mb-2 text-zinc-600"></i>
-                        ไม่มีข้อมูลตารางเวรของเดือน ${targetMonthName} ในคลาวด์
+                        ไม่มีข้อมูลตารางเวรของเดือน ${targetMonthName} ในระบบคลาวด์
                     </div>`;
+            }
+        }
+    }
+
+    // หน่วงเวลาให้ระบบโหลดข้อมูลจากชีตให้เสร็จก่อน แล้วแสดงผลเดือนปัจจุบัน
+    setTimeout(renderMonthlySchedule, 2500);
+
+    // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
+    function updateLivePreview(inputId, outputId) {
+        const inputEl = document.getElementById(inputId);
+        const outEl = document.getElementById(outputId);
+        if (inputEl && outEl) {
+            const val = inputEl.value;
+            if (val) {
+                outEl.innerText = "ตรวจสอบ: " + val;
+            } else {
+                outEl.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
             }
         }
     }
