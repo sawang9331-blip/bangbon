@@ -444,11 +444,19 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         const selectedMonth = monthEl.value.trim(); // "พฤษภาคม"
         const targetId = staffEl.value.trim();
 
-        // ค้นหาแบบเปรียบเทียบชื่อแท็บที่ตัดช่องว่างออกแล้ว
-        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.trim() === selectedMonth);
-        
+        // **ตัวแก้แบบหักดิบ:** ไม่ใช้ include แต่ใช้การวนลูปเทียบชื่อแท็บทั้งหมด
+        let targetSheetName = null;
+        for (let name in globalAllSheetsData) {
+            if (name.trim() === selectedMonth) {
+                targetSheetName = name;
+                break;
+            }
+        }
+
         if (!targetSheetName) {
-            summaryEl.innerText = "ไม่พบชื่อแท็บชีตที่ชื่อว่า [" + selectedMonth + "]";
+            // ถ้าหาไม่เจอ ให้โชว์ใน Console ว่ามีชื่ออะไรบ้าง (กด F12 แล้วดูแท็บ Console)
+            console.log("ชื่อแท็บที่มีในระบบคือ:", Object.keys(globalAllSheetsData));
+            summaryEl.innerText = "ไม่พบแท็บที่ชื่อว่า [" + selectedMonth + "] ในระบบ (ลองเช็คดูว่าในชีตชื่อมีช่องว่างหรือไม่)";
             resultBox.classList.remove('hidden');
             return;
         }
@@ -457,11 +465,10 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // วนลูปเริ่มที่ index 3 (แถวที่ 4 ในชีต)
+        // วนลูปหาแถวเจ้าหน้าที่ (เริ่มจาก index 3)
         for (let i = 3; i < sheetData.length; i++) {
             const row = sheetData[i];
             if (row[0] && row[0].toString().trim() === targetId) {
-                // อ่านคอลัมน์ 1-31
                 for (let col = 1; col <= 31; col++) {
                     const val = row[col];
                     if (val) {
@@ -480,8 +487,8 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             }
         }
 
-        summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวร: " + totalDays + " วัน";
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีรายการเวรในเดือนนี้</div>`;
+        summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวรทั้งหมด: " + totalDays + " วัน";
+        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีข้อมูลเวรในเดือนนี้</div>`;
         resultBox.classList.remove('hidden');
     }
 
