@@ -372,14 +372,14 @@
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.trim() === fullSheetName.trim());
             
             if (targetKey && globalAllSheetsData[targetKey]) {
-                displaySheetTable(globalAllSheetsData[targetKey]); // เรียกฟังก์ชันให้ชื่อตรงกัน
+                displaySheetTable(globalAllSheetsData[targetKey]);
             } else {
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
             }
         }
     }
 
-  // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (เวอร์ชันล็อกความกว้างช่องวันที่ให้เท่ากัน)
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (ล็อกความกว้างช่องและล้างค่าขยะหัวข้อ)
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -393,16 +393,13 @@
             row.forEach((cell, cellIndex) => {
                 let cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
                 
-                // 🔥 จุดสำคัญ: ถ้าเป็นแถวตัวเลขวันที่ ( cellIndex > 0 ) แล้วมีข้อความยาวเกิน 2 ตัวอักษร (เช่น ชื่อเดือนหลุดมา) ให้ตัดทิ้งหรือเอาเฉพาะตัวเลข
                 if (cellIndex > 0 && cellValue.length > 2) {
-                    // ดึงเอาเฉพาะตัวเลขที่เจอล่าสุด หรือถ้าไม่มีตัวเลขให้ปล่อยว่าง
                     const matchNumber = cellValue.match(/\d+/);
                     cellValue = matchNumber ? matchNumber[0] : '';
                 }
 
                 let bgStyle = '';
                 if (isHeader) {
-                    // ล็อกความกว้างช่องวันที่ให้กว้างช่องละ 35px เท่ากันทั้งหมด ไม่ให้โดนเบียด
                     const widthStyle = cellIndex === 0 ? 'min-w-[95px] w-[95px]' : 'min-w-[35px] w-[35px]';
                     bgStyle = `border: 1px solid #3f3f46; padding: 6px 2px; ${widthStyle};`;
                 } else {
@@ -593,7 +590,9 @@
         document.getElementById('btnConfirmSend').onclick = sendFinal;
     }
 
-    function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
+    function closePreview() { 
+        document.getElementById('previewOverlay').style.display = 'none'; 
+    }
 
     async function sendFinal() {
         if (!pendingData) return;
@@ -634,7 +633,9 @@
             switchTab('home');
         } catch (err) {
             console.error(err);
-            alert("ระบบคัดลอกรายงานแล้ว นำไปวางในไลน์ได้เลยครับ!");
+            const hint = document.getElementById('copyHint');
+            if(hint) hint.classList.remove('hidden');
+            setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
             closePreview();
             switchTab('home');
         } finally {
@@ -651,7 +652,7 @@
             if (data) {
                 globalAllSheetsData = data;
                 fetchTodayDuty();
-                renderMonthlySchedule(); // วาดตารางทันทีหลังจากดึงข้อมูลเสร็จ
+                renderMonthlySchedule(); 
             }
         } catch (error) {
             console.error(error);
@@ -669,6 +670,6 @@
 
         loadSheetsDataFromAppsScript();
     });
-</script>
+</script>    
 </body>
 </html>
