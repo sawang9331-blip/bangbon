@@ -467,17 +467,32 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
     }
 
     function generateStaff() {
-        let htmlTeam = '';
-        let htmlSend = '';
-        
-        for (let g = 1; g <= 4; g++) {
-            htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
-            htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
-            for (let i = 1; i <= 10; i++) {
-                const name = 'บางบอน ' + g + '-' + i;
-                htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
-                htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
-            }
+    let htmlTeam = '';
+    let htmlSend = '';
+    
+    for (let g = 1; g <= 4; g++) {
+        htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+        htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
+        for (let i = 1; i <= 10; i++) {
+            const name = 'บางบอน ' + g + '-' + i;
+            htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
+            htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
+        }
+        htmlTeam += '</div>';
+        htmlSend += '</div>';
+    }
+    
+    const fTeam = document.getElementById('fire_team_list');
+    const rTeam = document.getElementById('res_team_list');
+    const fSend = document.getElementById('fire_sender_list');
+    const rSend = document.getElementById('res_sender_list');
+    
+    // เพิ่มการตรวจสอบตรงนี้: ถ้ามี id นั้นๆ อยู่บนหน้าเว็บ ถึงจะยอมใส่ข้อมูลเข้าไป
+    if (fTeam) fTeam.innerHTML = htmlTeam;
+    if (rTeam) rTeam.innerHTML = htmlTeam;
+    if (fSend) fSend.innerHTML = htmlSend;
+    if (rSend) rSend.innerHTML = htmlSend;
+}
             htmlTeam += '</div>';
             htmlSend += '</div>';
         }
@@ -636,15 +651,15 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
     }
 
     // เริ่มต้นระบบเมื่อเปิดหน้าเว็บสำเร็จ
-    window.addEventListener("load", function() {
-        generateStaff();
-        switchTab('home'); 
-        const dateEl = document.getElementById('current-date');
-        if(dateEl) dateEl.innerText = getThaiDate();
-        
-        // เรียกใช้งานระบบ Fetch ดึงข้อมูลชีตแบบเบื้องหลัง
-        loadSheetsDataFromAppsScript();
-    });
+   window.addEventListener("load", function() {
+    generateStaff();
+    switchTab('home');
+    
+    const dateEl = document.getElementById('current-date');
+    if (dateEl) {
+        dateEl.innerText = getThaiDate();
+    }
+});
 </script>
 </body>
 </html>
