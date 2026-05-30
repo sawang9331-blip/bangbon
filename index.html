@@ -250,46 +250,6 @@
         </div>
     </div>
 
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4 shadow-md">
-        <span class="text-sm font-bold text-amber-400 flex items-center gap-1 mb-2">
-            <i class="fa-solid fa-magnifying-glass"></i> ค้นหาตารางเวรรายบุคคลล่วงหน้า
-        </span>
-        <div class="grid grid-cols-2 gap-2">
-            <div>
-                <label class="text-[11px] text-zinc-400">เลือกเดือน</label>
-        <select id="search-month-select" style="padding:8px; font-size:14px;" onchange="searchIndividualDuty()">
-                <option value="มกราคม 2569">มกราคม</option>
-                <option value="กุมภาพันธ์ 2569">กุมภาพันธ์</option>
-                <option value="มีนาคม 2569">มีนาคม</option>
-                <option value="เมษายน 2569">เมษายน</option>
-                <option value="พฤษภาคม 2569" selected>พฤษภาคม</option>
-                <option value="มิถุนายน 2569">มิถุนายน</option>
-                <option value="กรกฎาคม 2569">กรกฎาคม</option>
-                <option value="สิงหาคม 2569">สิงหาคม</option>
-                <option value="กันยายน 2569">กันยายน</option>
-                <option value="ตุลาคม 2569">ตุลาคม</option>
-                <option value="พฤศจิกายน 2569">พฤศจิกายน</option>
-                <option value="ธันวาคม 2569">ธันวาคม</option>
-        </select>
-            </div>
-            <div>
-                <label class="text-[11px] text-zinc-400">เลือกรหัสบุคคล</label>
-                <select id="search-staff-id" style="padding:8px; font-size:14px;" onchange="searchIndividualDuty()">
-                    <option value="">-- เลือกรหัส --</option>
-                    <option value="2-1">บางบอน 2-1</option><option value="2-2">บางบอน 2-2</option>
-                    <option value="2-3">บางบอน 2-3</option><option value="2-4">บางบอน 2-4</option>
-                    <option value="2-5">บางบอน 2-5</option><option value="2-6">บางบอน 2-6</option>
-                    <option value="2-7">บางบอน 2-7</option><option value="2-8">บางบอน 2-8</option>
-                    <option value="2-10">บางบอน 2-10</option><option value="2-11">บางบอน 2-11</option>
-                </select>
-            </div>
-        </div>
-        <div id="individual-result" class="mt-3 bg-black/40 border border-zinc-800 rounded-lg p-3 hidden">
-            <h4 class="text-xs font-bold text-amber-500 mb-2 border-b border-zinc-800 pb-1" id="ind-summary">ผลการตรวจสอบ</h4>
-            <div id="ind-details-list" class="space-y-1 max-h-48 overflow-y-auto text-xs text-zinc-300"></div>
-        </div>
-    </div>
-
     <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">ตารางเวรรวมทั้งหมด (เลื่อนดูด้านล่างได้)</p>
     <div class="w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 420px);">
         <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml?widget=false&amp;headers=false&amp;chrome=false" class="w-full h-full border-0 bg-white"></iframe>
