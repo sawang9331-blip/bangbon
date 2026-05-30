@@ -313,33 +313,39 @@
 </div>
 
 <script>
-    // 1. ประกาศตัวแปรและตั้งค่า URL ระบบหลังบ้าน
+    // 1. ประกาศตัวแปรระบบ
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2bKn0k86BDCWyWbSciceOSdudSJ_8VQIaJJAyis5RecfOuGRMECAPH/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
-    // กำหนดตัวแปรสำหรับเก็บข้อมูลตารางเวรทั้งหมดเป็น Global Object
     let globalAllSheetsData = {}; 
     let currentMonthOffset = 0;
     let pendingData = null;
 
-    // 2. ฟังก์ชันสลับแท็บหน้าเว็บ (เพิ่มกลับเข้าไปให้ครบถ้วน)
+    // 2. ระบบสลับหน้าต่างแท็บ (แก้ไขปัญหาการแสดงผลซ้อนกัน)
     function switchTab(tabId) {
-        // ซ่อนทุกแท็บ
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        // เอาสถานะ active ออกจากทุกปุ่มกดด้านล่าง
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        // ซ่อนเนื้อหาทุกแท็บก่อน
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.style.display = 'none');
         
-        // แสดงแท็บที่เลือก
+        // ลบแถบสีแดงกระพริบออกจากปุ่มเมนูด้านล่างทั้งหมด
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+        
+        // เปิดแสดงผลเฉพาะแท็บที่กดเลือก
         const targetTab = document.getElementById('tab-' + tabId);
-        if (targetTab) targetTab.classList.add('active');
+        if (targetTab) {
+            targetTab.style.display = 'block';
+        }
         
-        // ใส่สถานะ active ให้ปุ่มกดด้านล่างที่ตรงกับแท็บ
+        // ไฮไลต์สีแดงให้ปุ่มเมนูด้านล่างตัวที่เลือก
         const targetNav = document.getElementById('nav-' + tabId);
-        if (targetNav) targetNav.classList.add('active');
+        if (targetNav) {
+            targetNav.classList.add('active');
+        }
     }
 
-    // 3. ฟังก์ชันควบคุมการเปลี่ยนเดือนของตารางรวม
+    // 3. ฟังก์ชันควบคุมการเปลี่ยนเดือนของตารางเวรส่วนล่าง
     function changeMonth(offsetDirection) {
         currentMonthOffset += offsetDirection;
         renderMonthlySchedule();
@@ -347,7 +353,7 @@
 
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
-        const iframeEl = document.getElementById('sheet-iframe'); // เปลี่ยนมาคุม iframe แทน
+        const iframeEl = document.getElementById('sheet-iframe'); 
         
         const d = new Date();
         d.setMonth(d.getMonth() + currentMonthOffset);
@@ -355,38 +361,36 @@
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
         
-        // 1. อัปเดตตัวหนังสือแสดงเดือนบนหน้าเว็บ
         if (labelEl) {
             labelEl.innerText = targetMonthName + " " + (d.getFullYear() + 543);
         }
 
-        // 2. สั่งให้ iframe โดดไปดึงแท็บตามชื่อเดือนนั้นๆ บน Google Sheets
+        // สั่งเปลี่ยนหน้าลิงก์ iframe ไปยังแท็บเดือนที่เลือก
         if (iframeEl) {
             const baseUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml";
             iframeEl.src = baseUrl + "?sheet=" + encodeURIComponent(targetMonthName) + "&widget=false&headers=false&chrome=false";
         }
     }
-    // 4. ฟังก์ชันแสดง Live Preview (รวมเหลืออันเดียว ไม่ซ้ำซ้อน)
+
+    // 4. ฟังก์ชันแสดงข้อความตัวอย่างสดยามพิมพ์ข้อมูล
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
         if (inputEl && outEl) {
             const val = inputEl.value;
-            if (val) {
-                outEl.innerText = "ตรวจสอบ: " + val;
-            } else {
-                outEl.innerText = "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
-            }
+            outEl.innerText = val ? "ตรวจสอบ: " + val : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
         }
     }
 
-    // 5. ฟังก์ชันคำนวณและแสดงเวรประจำวันปัจจุบัน
+    // 5. ฟังก์ชันคำนวณเวรประจำวันบนหัวหน้าตาราง
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
         
         if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-zinc-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังโหลดข้อมูลตารางเวรล่วงหน้า...</div>`;
+            if (detailsContainer) {
+                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-zinc-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังโหลดข้อมูลตารางเวร...</div>`;
+            }
             return;
         }
 
@@ -400,8 +404,6 @@
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                const colIndex = today; 
-
                 let dutyPositions = { radioOp: '-', clerk: '-', guard: '-', pos501: '-' };
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
@@ -409,50 +411,47 @@
                     if (!row || row.length === 0) continue;
                     
                     const staffName = row[0] ? row[0].toString().trim() : '';
-                    if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ") || staffName.includes("หมายเหตุ")) continue;
+                    if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ")) continue;
 
-                    const dutyType = row[colIndex] ? parseInt(row[colIndex]) : 0;
-
+                    const dutyType = row[today] ? parseInt(row[today]) : 0;
                     if (dutyType === 1) dutyPositions.radioOp = staffName;
                     if (dutyType === 2) dutyPositions.clerk = staffName;
                     if (dutyType === 3) dutyPositions.guard = staffName;
                     if (dutyType === 4) dutyPositions.pos501 = staffName;
                 }
 
-                detailsContainer.innerHTML = `
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
-                        <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
-                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioOp}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
-                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.clerk}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-green-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
-                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
-                    </div>
-                    <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
-                        <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501}</span>
-                    </div>
-                `;
-                if(badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
-                
-            } else {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-amber-400"><i class="fa-solid fa-circle-exclamation mr-1"></i> ไม่พบตารางของเดือน ${currentMonth} ในระบบ</div>`;
+                if (detailsContainer) {
+                    detailsContainer.innerHTML = `
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
+                            <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
+                        </div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioOp}</span>
+                        </div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.clerk}</span>
+                        </div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-green-700/50">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
+                        </div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501}</span>
+                        </div>
+                    `;
+                }
+                if (badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
             }
         } catch (error) {
             console.error(error);
-            detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> เกิดข้อผิดพลาดในการคำนวณข้อมูลตารางเวร</div>`;
         }
     }
 
-    // 6. ฟังก์ชันสร้างรายชื่อเจ้าหน้าที่ (แก้ไขส่วนที่หลุดและปีกกาเกินแล้ว)
+    // 6. ฟังก์ชันสร้างรายชื่อกลุ่มบางบอนเพื่อเลือกรับงาน
     function generateStaff() {
         let htmlTeam = '';
         let htmlSend = '';
@@ -465,8 +464,8 @@
                 htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
                 htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
             }
-            htmlTeam += '</div>';
-            htmlSend += '</div>';
+            htmlTeam += '</div></div>';
+            htmlSend += '</div></div>';
         }
         
         const fTeam = document.getElementById('fire_team_list');
@@ -480,30 +479,24 @@
         if (rSend) rSend.innerHTML = htmlSend;
     }
 
-    // 7. ฟังก์ชันจัดการวันที่และเวลาของไทย
     function getThaiDate() {
         const d = new Date();
         const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         return "วันที่ " + d.getDate() + " " + m[d.getMonth()] + " " + (d.getFullYear() + 543);
     }
 
-    // 8. ฟังก์ชันเปิด-ปิด ช่องกรอก "เหตุอื่นๆ" ของการช่วยเหลือประชาชน
     function toggleOther() {
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
         const otherLp = document.getElementById('lp_res_type');
         if (s && otherInput && otherLp) {
-            if (s.value === 'เหตุอื่นๆ') {
-                otherInput.style.display = 'block';
-                otherLp.style.display = 'block';
-            } else {
-                otherInput.style.display = 'none';
-                otherLp.style.display = 'none';
-            }
+            const isOther = s.value === 'เหตุอื่นๆ';
+            otherInput.style.display = isOther ? 'block' : 'none';
+            otherLp.style.display = isOther ? 'block' : 'none';
         }
     }
 
-    // 9. ฟังก์ชันจัดเตรียมรายงานก่อนส่งออก
+    // 7. ฟังก์ชันรวบรวมรายงาน
     function prepareReport(type) {
         let text = "";
         let json = {};
@@ -511,8 +504,8 @@
 
         if (type === 'fire') {
             const place = document.getElementById('fire_place').value || '-';
-            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(function(v) { return v; }).join(', ') || '-';
-            const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
+            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
+            const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
             const t = {
                 1: document.getElementById('f_t1').value || '-',
@@ -530,7 +523,7 @@
             const place = document.getElementById('res_place').value || '-';
             const size = document.getElementById('res_len_text').value || '-';
             const car = document.getElementById('res_car_single').value || '-';
-            const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(function(e) { return e.value; }).join(', ') || '-';
+            const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
             const t = {
                 1: document.getElementById('r_t1').value || '-',
@@ -552,7 +545,7 @@
 
     function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
 
-    // 10. ฟังก์ชันส่งข้อมูลไปยังคลาวด์ (Supabase) และคัดลอกลงคลิปบอร์ด
+    // 8. ฟังก์ชันบันทึกและ Copy ลงคลิปบอร์ด
     async function sendFinal() {
         if (!pendingData) return;
         const btn = document.getElementById('btnConfirmSend');
@@ -586,13 +579,13 @@
 
             const hint = document.getElementById('copyHint');
             if(hint) hint.classList.remove('hidden');
-            setTimeout(function() { if(hint) hint.classList.add('hidden'); }, 3000);
+            setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
             btn.innerText = "ส่งสำเร็จแล้ว ✅";
             closePreview();
             switchTab('home');
         } catch (err) {
             console.error(err);
-            alert("ระบบได้ทำการ 'คัดลอกข้อความรายงาน' สามารถกดวางส่งเข้ากลุ่มไลน์ได้ทันทีครับ!");
+            alert("ระบบคัดลอกรายงานแล้ว นำไปวางในไลน์ได้เลยครับ!");
             closePreview();
             switchTab('home');
         } finally {
@@ -601,42 +594,33 @@
         }
     }
 
-    // 11. ฟังก์ชันดึงข้อมูลจาก Google Sheets Apps Script
+    // 9. เชื่อมต่อระบบตาราง Google Sheets 
     async function loadSheetsDataFromAppsScript() {
         try {
             const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
-            if (!response.ok) throw new Error("Network response was not ok");
+            if (!response.ok) throw new Error("Network error");
             const data = await response.json();
             if (data) {
                 globalAllSheetsData = data;
-                console.log("โหลดข้อมูลตารางเวรรวมสำเร็จ:", Object.keys(globalAllSheetsData));
-                
-                // สั่งให้คำนวณและแสดงเวรวันนี้ทันที
                 fetchTodayDuty();
-                // แสดงตารางรวมเดือนปัจจุบัน
-                renderMonthlySchedule();
             }
         } catch (error) {
-            console.error("ผิดพลาดในการดึงตารางเวรจาก Apps Script:", error);
-            const detailsContainer = document.getElementById('today-duty-details');
-            if (detailsContainer) {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ไม่สามารถเชื่อมต่อตารางเวรได้</div>`;
-            }
+            console.error(error);
         }
     }
 
-    // 12. เริ่มต้นระบบเมื่อหน้าเว็บโหลดเสร็จสิ้น
-    window.addEventListener("load", function() {
+    // 10. รันระบบทั้งหมดทันทีเมื่อหน้าเว็บพร้อมทำงาน
+    window.addEventListener("load", () => {
         generateStaff();
-        switchTab('home');
+        switchTab('home'); // บังคับเปิดหน้าแรก หน้าอื่นจะถูกซ่อนอย่างถูกต้อง
         
         const dateEl = document.getElementById('current-date');
         if (dateEl) {
             dateEl.innerText = getThaiDate();
         }
 
-        // เรียกดึงข้อมูลเวรจากสคริปต์ Google Sheets ทันทีที่เปิดแอป
         loadSheetsDataFromAppsScript();
+        renderMonthlySchedule();
     });
 </script>
 </body>
