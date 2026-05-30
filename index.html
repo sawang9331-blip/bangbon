@@ -431,7 +431,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (แก้ไขให้คำนวณวันเข้าเวรได้ถูกต้อง)
+    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ปรับปรุงการค้นหาแถวข้อมูล)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -444,11 +444,11 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             return;
         }
 
-        const selectedMonth = monthEl.value; // เช่น "พฤษภาคม"
-        const targetId = staffEl.value.trim(); // เช่น "บางบอน 2-2"
+        const selectedMonth = monthEl.value; // ค่าจะเป็น เช่น "พฤษภาคม 2569"
+        const targetId = staffEl.value.trim(); // ค่าจะเป็น เช่น "บางบอน 2-2"
         
         // ค้นหาแท็บชีตที่มีชื่อเดือนตรงกัน
-        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
+        let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth.split(" ")[0]));
         if (!targetSheetName) {
             summaryEl.innerText = `ไม่พบข้อมูลตารางของเดือน [${selectedMonth}]`;
             listEl.innerHTML = `<div class="text-zinc-500 p-2 text-center">ไม่มีแท็บชีตเดือน ${selectedMonth} ในระบบ</div>`;
@@ -460,24 +460,27 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // วนลูปหาแถวที่มีชื่อรหัสเจ้าหน้าที่ตรงกับที่เลือก
+        // วนลูปตรวจสอบทุกแถว ตั้งแต่แถวแรก (index 0) เพื่อไม่ให้พลาดข้อมูลรายชื่อใด ๆ
         let staffRow = null;
         for (let i = 0; i < sheetMatrix.length; i++) {
-            if (sheetMatrix[i] && sheetMatrix[i][0] && sheetMatrix[i][0].toString().trim() === targetId) {
-                staffRow = sheetMatrix[i];
-                break;
+            if (sheetMatrix[i] && sheetMatrix[i][0]) {
+                const currentNameInSheet = sheetMatrix[i][0].toString().trim();
+                if (currentNameInSheet === targetId) {
+                    staffRow = sheetMatrix[i];
+                    break; // เจอแถวข้อมูลของคนนั้นแล้ว ให้หยุดลูปค้นหา
+                }
             }
         }
 
         if (staffRow) {
-            // ในตารางของคุณ คอลัมน์ที่ 1 คือวันที่ 1 ไปจนถึงคอลัมน์ที่ 31 คือวันที่ 31
+            // ในตาราง คอลัมน์ index ที่ 1 คือวันที่ 1 ไปจนถึงคอลัมน์ index ที่ 31 คือวันที่ 31
             for (let day = 1; day <= 31; day++) {
-                if (day >= staffRow.length) break; // ป้องกันกรณีข้อมูลคอลัมน์ไม่ครบ
+                if (day >= staffRow.length) break;
                 
                 const dutyType = staffRow[day] ? parseInt(staffRow[day]) : 0;
                 let roleName = "";
                 
-                // ถอดรหัสตัวเลขเป็นชื่อหน้าที่ตามเงื่อนไขของสถานี
+                // แปลงตัวเลขหน้าที่ในช่องตารางให้เป็นข้อความ
                 if (dutyType === 1) roleName = "พนักงานวิทยุ (1)";
                 if (dutyType === 2) roleName = "เสมียนเวร (2)";
                 if (dutyType === 3) roleName = "รักษาสถานที่ (3)";
@@ -487,7 +490,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
                     totalDays++;
                     htmlDetails += `
                         <div class="p-2 border-b border-zinc-800 flex justify-between items-center text-xs">
-                            <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth}</span>
+                            <span class="text-zinc-300">📅 วันที่ ${day} ${selectedMonth.split(" ")[0]}</span>
                             <div class="text-right">
                                 <span class="text-amber-400 font-semibold bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">${roleName}</span>
                             </div>
@@ -496,7 +499,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             }
         }
 
-        // แสดงผลลัพธ์ที่คำนวณได้จริงบนหน้าจอ
+        // อัปเดตข้อมูลจำนวนวันและรายการหน้าที่ขึ้นแสดงบนหน้าเว็บ
         summaryEl.innerText = `${targetId} ในเดือน [${selectedMonth}] เข้าเวรทั้งหมด: ${totalDays} วัน`;
         listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่พบกำหนดการเข้าเวรในเดือน ${selectedMonth}</div>`;
         resultBox.classList.remove('hidden');
