@@ -349,7 +349,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         if (tabId === 'schedule') fetchTodayDuty();
     }
 
-   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (ปรับปรุงให้อ่านตารางสลับแกนตามชีตจริง)
+   // 2. ฟังก์ชันแสดงเวรประจำวันปัจจุบัน (สลับแท็บเดือนอัตโนมัติ)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -365,22 +365,23 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             const currentMonth = thaiMonths[d.getMonth()];
             const today = d.getDate(); // วันที่ปัจจุบัน (1-31)
             
+            // ค้นหาคีย์ชื่อแท็บที่มีคำว่า "พฤษภาคม" หรือ "มิถุนายน" ตามเดือนปัจจุบัน
             let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(currentMonth));
+            
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                
-                // คอลัมน์ของวันที่ปัจจุบันในตาราง (วันที่ 1 จะอยู่ที่ Matrix คอลัมน์ index ที่ today)
-                // เนื่องจากคอลัมน์แรก (index 0) ในตารางของคุณคือ "รายชื่อ/วันที่"
-                const colIndex = today; 
+                const colIndex = today; // คอลัมน์ที่ตรงกับวันที่
 
                 let dutyPositions = { radioOp: '-', clerk: '-', guard: '-', pos501: '-' };
-                let dutySet = "-";
 
-                // วนลูปอ่านทุกแถวในตารางเพื่อจับคู่ว่าใครได้เลขอะไรในวันนี้
-                for (let i = 2; i < sheetMatrix.length; i++) {
+                // แถวที่ 1 ในตารางดึงมาเช็คหัวข้อ (แถวรายชื่อจะเริ่มจาก index 3 หรือ 4 เป็นต้นไป)
+                for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
+                    if (!row || row.length === 0) continue;
+                    
                     const staffName = row[0] ? row[0].toString().trim() : '';
-                    if (!staffName || staffName === 'หมายเหตุ') continue;
+                    // ข้ามแถวที่ไม่ใช่รายชื่อเจ้าหน้าที่
+                    if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ") || staffName.includes("หมายเหตุ")) continue;
 
                     const dutyType = row[colIndex] ? parseInt(row[colIndex]) : 0;
 
@@ -392,7 +393,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
 
                 detailsContainer.innerHTML = `
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
-                        <span class="text-xs text-zinc-400 block"><i class="fa-solid =/users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
+                        <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
                         <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
                     </div>
                     <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
@@ -424,7 +425,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ปรับให้เข้ากับตารางสลับแกน)
+    // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (ดึงตามเดือนที่ผู้ใช้เลือกใน Dropdown)
     function searchIndividualDuty() {
         const monthEl = document.getElementById('search-month-select');
         const staffEl = document.getElementById('search-staff-id');
@@ -437,12 +438,14 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
             return;
         }
 
-        const selectedMonth = monthEl.value;
-        const targetId = staffEl.value.trim(); // เช่น "บางบอน 2-2"
+        const selectedMonth = monthEl.value; // ค่าที่เลือก เช่น "พฤษภาคม" หรือ "มิถุนายน"
+        const targetId = staffEl.value.trim(); // รหัสที่ค้นหา เช่น "บางบอน 2-2"
         
         let targetSheetName = Object.keys(globalAllSheetsData).find(name => name.includes(selectedMonth));
         if (!targetSheetName) {
-            if (resultBox) resultBox.classList.add('hidden');
+            summaryEl.innerText = `ไม่พบข้อมูลตารางของเดือน [${selectedMonth}]`;
+            listEl.innerHTML = `<div class="text-zinc-500 p-2 text-center">ไม่มีแท็บชีตเดือน ${selectedMonth} ในระบบ</div>`;
+            resultBox.classList.remove('hidden');
             return;
         }
 
@@ -450,9 +453,9 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         let totalDays = 0;
         let htmlDetails = "";
 
-        // ค้นหาแถวของเจ้าหน้าที่คนนั้น ๆ
+        // วนลูปหาแถวของเจ้าหน้าที่คนนั้นในเดือนที่เลือก
         let staffRow = null;
-        for (let i = 2; i < sheetMatrix.length; i++) {
+        for (let i = 0; i < sheetMatrix.length; i++) {
             if (sheetMatrix[i][0] && sheetMatrix[i][0].toString().trim() === targetId) {
                 staffRow = sheetMatrix[i];
                 break;
@@ -460,7 +463,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
 
         if (staffRow) {
-            // วนลูปตั้งแต่วันที่ 1 ถึง 31 (ตามคอลัมน์ index ที่ 1 ถึง 31)
+            // ไล่เช็คทีละคอลัมน์ตั้งแต่วันที่ 1 ถึง 31
             for (let day = 1; day <= 31; day++) {
                 const dutyType = staffRow[day] ? parseInt(staffRow[day]) : 0;
                 let roleName = "";
