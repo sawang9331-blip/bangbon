@@ -431,68 +431,9 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvd26BHoROow2b
         }
     }
 
-   // 3. ฟังก์ชันค้นหาตารางเวรรายบุคคลล่วงหน้า (แก้ไขจุดตรวจสอบชื่อแท็บเดือนให้ตรงกัน 100%)
-    function searchIndividualDuty() {
-        const monthEl = document.getElementById('search-month-select');
-        const staffEl = document.getElementById('search-staff-id');
-        const resultBox = document.getElementById('individual-result');
-        const summaryEl = document.getElementById('ind-summary');
-        const listEl = document.getElementById('ind-details-list');
+  
 
-        if (!monthEl || !staffEl || !globalAllSheetsData) return;
-
-        const selectedMonth = monthEl.value.trim(); // "พฤษภาคม"
-        const targetId = staffEl.value.trim();
-
-        // **ตัวแก้แบบหักดิบ:** ไม่ใช้ include แต่ใช้การวนลูปเทียบชื่อแท็บทั้งหมด
-        let targetSheetName = null;
-        for (let name in globalAllSheetsData) {
-            if (name.trim() === selectedMonth) {
-                targetSheetName = name;
-                break;
-            }
-        }
-
-        if (!targetSheetName) {
-            // ถ้าหาไม่เจอ ให้โชว์ใน Console ว่ามีชื่ออะไรบ้าง (กด F12 แล้วดูแท็บ Console)
-            console.log("ชื่อแท็บที่มีในระบบคือ:", Object.keys(globalAllSheetsData));
-            summaryEl.innerText = "ไม่พบแท็บที่ชื่อว่า [" + selectedMonth + "] ในระบบ (ลองเช็คดูว่าในชีตชื่อมีช่องว่างหรือไม่)";
-            resultBox.classList.remove('hidden');
-            return;
-        }
-
-        const sheetData = globalAllSheetsData[targetSheetName];
-        let totalDays = 0;
-        let htmlDetails = "";
-
-        // วนลูปหาแถวเจ้าหน้าที่ (เริ่มจาก index 3)
-        for (let i = 3; i < sheetData.length; i++) {
-            const row = sheetData[i];
-            if (row[0] && row[0].toString().trim() === targetId) {
-                for (let col = 1; col <= 31; col++) {
-                    const val = row[col];
-                    if (val) {
-                        const dutyType = parseInt(val.toString().trim());
-                        if (dutyType >= 1 && dutyType <= 4) {
-                            totalDays++;
-                            const roleNames = ["", "พนักงานวิทยุ (1)", "เสมียนเวร (2)", "รักษาสถานที่ (3)", "ตำแหน่ง 501 (4)"];
-                            htmlDetails += `<div class="p-2 border-b border-zinc-800 flex justify-between text-xs">
-                                <span class="text-zinc-300">📅 วันที่ ${col}</span>
-                                <span class="text-amber-400 font-semibold">${roleNames[dutyType]}</span>
-                            </div>`;
-                        }
-                    }
-                }
-                break;
-            }
-        }
-
-        summaryEl.innerText = targetId + " ในเดือน [" + selectedMonth + "] เข้าเวรทั้งหมด: " + totalDays + " วัน";
-        listEl.innerHTML = htmlDetails || `<div class="text-zinc-500 p-2 text-center">ไม่มีข้อมูลเวรในเดือนนี้</div>`;
-        resultBox.classList.remove('hidden');
-    }
-
-    // 4. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
+    // 3. ฟังก์ชันจัดการข้อมูลรายงานและการทำงานส่วนอื่นๆ
     function updateLivePreview(inputId, outputId) {
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
