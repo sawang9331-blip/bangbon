@@ -267,10 +267,13 @@
     </div>
     
     <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">ตารางเวรรวมทั้งหมด (เลื่อนดูด้านล่างได้)</p>
-    <div class="w-full overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 420px);">
-        <iframe id="sheet-iframe" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml?widget=false&amp;headers=false&amp;chrome=false" class="w-full h-full border-0 bg-white"></iframe>
+    <div class="w-full overflow-auto rounded-xl bg-zinc-900 border border-zinc-800" style="height: calc(100vh - 420px);">
+        <div id="sheet-data-container" class="w-full text-zinc-300 text-xs p-1">
+            <div class="text-center py-8 text-zinc-500">
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังเตรียมข้อมูลตารางเวร...
+            </div>
+        </div>
     </div>
-</div>
 
 <div class="nav-bar">
     <div id="nav-home" class="nav-item" onclick="switchTab('home')">
@@ -342,48 +345,80 @@
 
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
-        const iframeEl = document.getElementById('sheet-iframe'); 
+        const containerEl = document.getElementById('sheet-data-container');
         
         const d = new Date();
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[d.getMonth()];
-        const targetYearThai = d.getFullYear() + 543; // คำนวณปี พ.ศ. (เช่น 2569)
+        const targetYearThai = d.getFullYear() + 543;
+        
+        const fullSheetName = targetMonthName + " " + targetYearThai;
         
         if (labelEl) {
-            labelEl.innerText = targetMonthName + " " + targetYearThai;
+            labelEl.innerText = fullSheetName;
         }
 
-        if (iframeEl) {
-            const baseUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCT3x9H1D3zSLsEUG_xGkoJhWZh1JKM0XI0_2HHyyIGH6JBvGb2uHfm4_GKvAOfWv4ADa8S4sdkuB0/pubhtml";
-            
-            // รวมชื่อเดือนกับปี พ.ศ. ให้ตรงกับชื่อแท็บจริง (เช่น "มิถุนายน 2569")
-            const fullSheetName = targetMonthName + " " + targetYearThai; 
-            
-            iframeEl.src = baseUrl + "?sheet=" + encodeURIComponent(fullSheetName) + "&widget=false&headers=false&chrome=false";
-        }
-    }
-
-    function updateLivePreview(inputId, outputId) {
-        const inputEl = document.getElementById(inputId);
-        const outEl = document.getElementById(outputId);
-        if (inputEl && outEl) {
-            const val = inputEl.value;
-            outEl.innerText = val ? "ตรวจสอบ: " + val : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
-        }
-    }
-
-    async function fetchTodayDuty() {
-        const detailsContainer = document.getElementById('today-duty-details');
-        const badgeContainer = document.getElementById('today-date-badge');
-        
-        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-            if (detailsContainer) {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-zinc-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังโหลดข้อมูลตารางเวร...</div>`;
+        // วาดตารางใหม่จากข้อมูลชีตที่โหลดมาตามเดือนที่เลือก
+        if (containerEl) {
+            if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
+                return;
             }
-            return;
+
+            // ค้นหาแท็บข้อมูลที่ชื่อตรงกัน
+            let targetKey = Object.keys(globalAllSheetsData).find(name => name.trim() === fullSheetName.trim());
+            
+            if (targetKey && globalAllSheetsData[targetKey]) {
+                displaySheetTable(globalAllSheetsData[targetKey]);
+            } else {
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
+            }
         }
+    }
+
+    // ฟังก์ชันสร้างตาราง HTML ออกมาแสดงผลแบบ Dark Mode
+    function displaySheetTable(matrix) {
+        const container = document.getElementById('sheet-data-container');
+        if (!container || !matrix || matrix.length === 0) return;
+
+        let html = '<div class="overflow-x-auto"><table class="min-w-full border-collapse text-center" style="font-size: 11px;">';
+        
+        matrix.forEach((row, rowIndex) => {
+            // เช็คว่าเป็นแถวหัวข้อตารางหรือไม่ (3 แถวแรก)
+            const isHeader = rowIndex < 4;
+            html += `<tr class="${isHeader ? 'bg-zinc-800 text-amber-400 font-bold sticky top-0' : 'hover:bg-zinc-800/40 border-b border-zinc-800/60'}">`;
+            
+            row.forEach((cell, cellIndex) => {
+                const cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
+                
+                // ตกแต่งสไตล์ช่องตารางแยกตามประเภทข้อมูล
+                let bgStyle = '';
+                if (isHeader) {
+                    bgStyle = 'border: 1px solid #3f3f46; padding: 6px 4px;';
+                } else {
+                    bgStyle = 'border: 1px solid #27272a; padding: 6px 4px;';
+                    // ทำสีไฮไลต์สำหรับประเภทเวรยาม
+                    if (cellValue === '1') bgStyle += ' background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; font-weight: bold;'; // วิทยุ
+                    if (cellValue === '2') bgStyle += ' background-color: rgba(168, 85, 247, 0.15); color: #c084fc; font-weight: bold;'; // เสมียน
+                    if (cellValue === '3') bgStyle += ' background-color: rgba(34, 197, 94, 0.15); color: #4ade80; font-weight: bold;';  // รักษาสถานที่
+                    if (cellValue === '4') bgStyle += ' background-color: rgba(249, 115, 22, 0.15); color: #fb923c; font-weight: bold;';  // 501
+                    if (cellValue === 'พ') bgStyle += ' color: #71717a;'; // เวรพัก
+                }
+                
+                // ดันคอลัมน์ชื่อพนักงาน (คอลัมน์แรก) ให้ชิดซ้ายเพื่อให้อ่านง่าย
+                const textAlign = cellIndex === 0 ? 'text-left font-bold min-w-[90px] px-2' : 'text-center';
+                const tag = isHeader ? 'th' : 'td';
+                
+                html += `<${tag} class="${textAlign}" style="${bgStyle}">${cellValue}</${tag}>`;
+            });
+            html += '</tr>';
+        });
+        
+        html += '</table></div>';
+        container.innerHTML = html;
+    }
 
         try {
             const d = new Date();
@@ -582,7 +617,7 @@
         }
     }
 
-    async function loadSheetsDataFromAppsScript() {
+   async function loadSheetsDataFromAppsScript() {
         try {
             const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
             if (!response.ok) throw new Error("Network error");
@@ -590,6 +625,7 @@
             if (data) {
                 globalAllSheetsData = data;
                 fetchTodayDuty();
+                renderMonthlySchedule(); // มั่นใจว่าโหลดมาปุ๊บวาดปั๊บ
             }
         } catch (error) {
             console.error(error);
