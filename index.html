@@ -363,7 +363,7 @@
         }
     }
 
- // 1. ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน (ล็อก offset ให้อยู่แค่ -1, 0, 1)
+ // ชั้นที่ 1: ควบคุมปุ่มกด (ล็อกให้ Offset วิ่งได้แค่ -1, 0, 1)
     function changeMonth(offsetDirection) {
         const nextOffset = currentMonthOffset + offsetDirection;
         if (nextOffset >= -1 && nextOffset <= 1) {
@@ -372,17 +372,17 @@
         }
     }
 
-    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
+    // ชั้นที่ 2: ตรวจสอบวันเวลาและตรวจสอบความมีอยู่จริงของแท็บใน Google Sheets (เสมือนปฏิทินออนไลน์)
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
         
-        // บังคับล็อกตัวแปร offset ให้อยู่แค่ -1, 0, 1 เพื่อความชัวร์
+        // บังคับล็อกตัวแปร offset ป้องกันการกดรัวล้นขอบเขต
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
 
         const d = new Date();
-        // บังคับให้เป็นวันที่ 1 ก่อน เพื่อป้องกันปัญหาวันที่ล้นสำหรับเดือนที่มี 30 วัน
+        // ป้องกันปัญหาวันล้น (Date Overflow) โดยตั้งเป็นวันที่ 1 ไว้ก่อน
         d.setDate(1); 
         d.setMonth(d.getMonth() + currentMonthOffset);
         
@@ -402,12 +402,14 @@
                 return;
             }
 
-            // ค้นหาแท็บโดยตัดช่องว่างออก
+            // ค้นหาแท็บโดยตัดช่องว่างออก (เปรียบเทียบค่าแบบชัวร์ๆ)
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
             
+            // ตรวจสอบชั้นที่ 2: ถ้าคำนวณเดือนตามปฏิทินแล้ว มีชื่อแท็บนั้นอยู่ใน Google Sheets จริงๆ ถึงจะวาดตาราง
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
             } else {
+                // ถ้าไม่เจอชีตตามปฏิทินคำนวณ (เช่น ยังไม่ได้สร้างแท็บเดือนนั้นไว้) จะแสดงกล่องแจ้งเตือนสีส้มทันที
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
             }
         }
