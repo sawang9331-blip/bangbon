@@ -372,18 +372,20 @@
         }
     }
 
-    // ชั้นที่ 2: ตรวจสอบวันเวลาและตรวจสอบความมีอยู่จริงของแท็บใน Google Sheets (เสมือนปฏิทินออนไลน์)
+    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (แก้ไขปัญหาวันล้นช่วงสิ้นเดือนถาวร)
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
         
-        // บังคับล็อกตัวแปร offset ป้องกันการกดรัวล้นขอบเขต
+        // บังคับล็อกตัวแปร offset ป้องกันการกดรัวจนหลุดขอบเขต (-1, 0, 1)
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
 
+        // แก้ไขจุดนี้: สร้างฐานเวลาขึ้นมา แล้วบังคับย้อนไปวันที่ 1 ของเดือนปัจจุบันทันที
         const d = new Date();
-        // ป้องกันปัญหาวันล้น (Date Overflow) โดยตั้งเป็นวันที่ 1 ไว้ก่อน
         d.setDate(1); 
+        
+        // หลังจากเป็นวันที่ 1 แล้ว ค่อยทำการบวกหรือลดเดือนตามปุ่มที่กด (จะไม่มีทางวันล้น)
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -402,14 +404,12 @@
                 return;
             }
 
-            // ค้นหาแท็บโดยตัดช่องว่างออก (เปรียบเทียบค่าแบบชัวร์ๆ)
+            // ค้นหาแท็บโดยตัดช่องว่างออก
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
             
-            // ตรวจสอบชั้นที่ 2: ถ้าคำนวณเดือนตามปฏิทินแล้ว มีชื่อแท็บนั้นอยู่ใน Google Sheets จริงๆ ถึงจะวาดตาราง
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
             } else {
-                // ถ้าไม่เจอชีตตามปฏิทินคำนวณ (เช่น ยังไม่ได้สร้างแท็บเดือนนั้นไว้) จะแสดงกล่องแจ้งเตือนสีส้มทันที
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
             }
         }
