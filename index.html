@@ -363,7 +363,7 @@
         }
     }
 
- // ชั้นที่ 1: ควบคุมปุ่มกด (ล็อกให้ Offset วิ่งได้แค่ -1, 0, 1)
+    // ชั้นที่ 1: ควบคุมปุ่มกด (ล็อกให้ Offset วิ่งได้แค่ -1, 0, 1)
     function changeMonth(offsetDirection) {
         const nextOffset = currentMonthOffset + offsetDirection;
         if (nextOffset >= -1 && nextOffset <= 1) {
@@ -372,7 +372,7 @@
         }
     }
 
-   // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (ใช้วิธีนับเดือนตรงๆ ตัดปัญหาวันสิ้นเดือนถาวร)
+    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (ใช้วิธีนับเดือนตรงๆ ตัดปัญหาวันสิ้นเดือนถาวร มีเพียงอันเดียว)
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
@@ -417,41 +417,6 @@
 
             // ค้นหาแท็บโดยตัดช่องว่างออก
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
-            
-            if (targetKey && globalAllSheetsData[targetKey]) {
-                displaySheetTable(globalAllSheetsData[targetKey]);
-            } else {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
-            }
-        }
-    }
-
-    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
-    function renderMonthlySchedule() {
-        const labelEl = document.getElementById('current-view-month-label');
-        const containerEl = document.getElementById('sheet-data-container');
-        
-        const d = new Date();
-        d.setMonth(d.getMonth() + currentMonthOffset);
-        
-        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const targetMonthName = thaiMonths[d.getMonth()];
-        const targetYearThai = d.getFullYear() + 543;
-        
-        const fullSheetName = targetMonthName + " " + targetYearThai;
-        
-        if (labelEl) {
-            labelEl.innerText = fullSheetName;
-        }
-
-        if (containerEl) {
-            if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
-                return;
-            }
-
-            // บังคับลบช่องว่างออกทั้งชื่อแท็บจาก Sheets และชื่อเดือนที่หน้าเว็บคำนวณ ก่อนเอามาเทียบกัน
-let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
             
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
@@ -751,6 +716,6 @@ let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/
 
         loadSheetsDataFromAppsScript();
     });
-</script>   
+</script>  
 </body>
 </html>
