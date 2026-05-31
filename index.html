@@ -363,17 +363,51 @@
         }
     }
 
- // ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน (จำกัดให้ดูได้แค่ เดือนก่อนหน้า, ปัจจุบัน, และเดือนถัดไป)
+ // 1. ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน (ล็อก offset ให้อยู่แค่ -1, 0, 1)
     function changeMonth(offsetDirection) {
         const nextOffset = currentMonthOffset + offsetDirection;
-        
-        // -1 คือเดือนก่อนหน้า, 0 คือเดือนปัจจุบัน, 1 คือเดือนถัดไป
         if (nextOffset >= -1 && nextOffset <= 1) {
             currentMonthOffset = nextOffset;
             renderMonthlySchedule();
-        } else {
-            // แจ้งเตือนผู้ใช้เบาๆ ว่าจำกัดสิทธิ์การดู (หรือจะไม่ใส่ก็ได้ครับ)
-            alert("ระบบจำกัดการดึงข้อมูลเฉพาะเดือนก่อนหน้า ปัจจุบัน และเดือนถัดไปเท่านั้น เพื่อความรวดเร็วครับ");
+        }
+    }
+
+    // 2. ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
+    function renderMonthlySchedule() {
+        const labelEl = document.getElementById('current-view-month-label');
+        const containerEl = document.getElementById('sheet-data-container');
+        
+        // บังคับล็อกตัวแปร offset อีกชั้นเพื่อความชัวร์ ไม่ให้หลุดรอดไปเดือนอื่น
+        if (currentMonthOffset < -1) currentMonthOffset = -1;
+        if (currentMonthOffset > 1) currentMonthOffset = 1;
+
+        const d = new Date();
+        d.setMonth(d.getMonth() + currentMonthOffset);
+        
+        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const targetMonthName = thaiMonths[d.getMonth()];
+        const targetYearThai = d.getFullYear() + 543;
+        
+        const fullSheetName = targetMonthName + " " + targetYearThai;
+        
+        if (labelEl) {
+            labelEl.innerText = fullSheetName;
+        }
+
+        if (containerEl) {
+            if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
+                return;
+            }
+
+            // ค้นหาแท็บโดยตัดช่องว่างออก
+            let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
+            
+            if (targetKey && globalAllSheetsData[targetKey]) {
+                displaySheetTable(globalAllSheetsData[targetKey]);
+            } else {
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
+            }
         }
     }
 
