@@ -389,7 +389,7 @@
         // 2. คำนวณบวกลบเดือนตรงๆ จากปุ่มกด (currentMonthOffset) ไม่ผ่านวันที่
         currentMonthIdx += currentMonthOffset;
         
-        // ป้องกันกรณีข้ามปี (ถ้าลดจนน้อยกว่า 0 ให้ถอยไปปีเก่า, ถ้าเกิน 11 ให้ขึ้นปีใหม่)
+        // ป้องกันกรณีข้ามปี
         if (currentMonthIdx < 0) {
             currentMonthIdx = 11;
             currentYear--;
