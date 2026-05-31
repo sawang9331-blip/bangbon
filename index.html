@@ -372,7 +372,7 @@
         }
     }
 
-    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (แก้ไขปัญหาวันล้นช่วงสิ้นเดือนถาวร)
+   // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (ใช้วิธีนับเดือนตรงๆ ตัดปัญหาวันสิ้นเดือนถาวร)
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
@@ -381,16 +381,27 @@
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
 
-        // แก้ไขจุดนี้: สร้างฐานเวลาขึ้นมา แล้วบังคับย้อนไปวันที่ 1 ของเดือนปัจจุบันทันที
-        const d = new Date();
-        d.setDate(1); 
+        // 1. ดึงเดือนปัจจุบัน และ ปีปัจจุบัน จากระบบขึ้นมาก่อน
+        const now = new Date();
+        let currentMonthIdx = now.getMonth(); // พฤษภาคม = 4
+        let currentYear = now.getFullYear();  // 2026
         
-        // หลังจากเป็นวันที่ 1 แล้ว ค่อยทำการบวกหรือลดเดือนตามปุ่มที่กด (จะไม่มีทางวันล้น)
-        d.setMonth(d.getMonth() + currentMonthOffset);
+        // 2. คำนวณบวกลบเดือนตรงๆ จากปุ่มกด (currentMonthOffset) ไม่ผ่านวันที่
+        currentMonthIdx += currentMonthOffset;
         
+        // ป้องกันกรณีข้ามปี (ถ้าลดจนน้อยกว่า 0 ให้ถอยไปปีเก่า, ถ้าเกิน 11 ให้ขึ้นปีใหม่)
+        if (currentMonthIdx < 0) {
+            currentMonthIdx = 11;
+            currentYear--;
+        } else if (currentMonthIdx > 11) {
+            currentMonthIdx = 0;
+            currentYear++;
+        }
+        
+        // 3. แปลงเป็นชื่อเดือนภาษาไทยและปี พ.ศ.
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const targetMonthName = thaiMonths[d.getMonth()];
-        const targetYearThai = d.getFullYear() + 543;
+        const targetMonthName = thaiMonths[currentMonthIdx];
+        const targetYearThai = currentYear + 543;
         
         const fullSheetName = targetMonthName + " " + targetYearThai;
         
