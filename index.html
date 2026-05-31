@@ -372,16 +372,18 @@
         }
     }
 
-    // 2. ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
+    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
         
-        // บังคับล็อกตัวแปร offset อีกชั้นเพื่อความชัวร์ ไม่ให้หลุดรอดไปเดือนอื่น
+        // บังคับล็อกตัวแปร offset ให้อยู่แค่ -1, 0, 1 เพื่อความชัวร์
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
 
         const d = new Date();
+        // บังคับให้เป็นวันที่ 1 ก่อน เพื่อป้องกันปัญหาวันที่ล้นสำหรับเดือนที่มี 30 วัน
+        d.setDate(1); 
         d.setMonth(d.getMonth() + currentMonthOffset);
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
