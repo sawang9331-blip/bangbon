@@ -394,7 +394,7 @@
             }
 
             // บังคับลบช่องว่างออกทั้งชื่อแท็บจาก Sheets และชื่อเดือนที่หน้าเว็บคำนวณ ก่อนเอามาเทียบกัน
-let ta        rgetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
+let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
             
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
