@@ -363,10 +363,18 @@
         }
     }
 
-    // ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน
+ // ฟังก์ชันควบคุมปุ่มเปลี่ยนเดือน (จำกัดให้ดูได้แค่ เดือนก่อนหน้า, ปัจจุบัน, และเดือนถัดไป)
     function changeMonth(offsetDirection) {
-        currentMonthOffset += offsetDirection;
-        renderMonthlySchedule();
+        const nextOffset = currentMonthOffset + offsetDirection;
+        
+        // -1 คือเดือนก่อนหน้า, 0 คือเดือนปัจจุบัน, 1 คือเดือนถัดไป
+        if (nextOffset >= -1 && nextOffset <= 1) {
+            currentMonthOffset = nextOffset;
+            renderMonthlySchedule();
+        } else {
+            // แจ้งเตือนผู้ใช้เบาๆ ว่าจำกัดสิทธิ์การดู (หรือจะไม่ใส่ก็ได้ครับ)
+            alert("ระบบจำกัดการดึงข้อมูลเฉพาะเดือนก่อนหน้า ปัจจุบัน และเดือนถัดไปเท่านั้น เพื่อความรวดเร็วครับ");
+        }
     }
 
     // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
