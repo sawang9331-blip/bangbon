@@ -372,24 +372,20 @@
         }
     }
 
-    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง (ใช้วิธีนับเดือนตรงๆ ตัดปัญหาวันสิ้นเดือนถาวร มีเพียงอันเดียว)
+    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
         
-        // บังคับล็อกตัวแปร offset ป้องกันการกดรัวจนหลุดขอบเขต (-1, 0, 1)
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
 
-        // 1. ดึงเดือนปัจจุบัน และ ปีปัจจุบัน จากระบบขึ้นมาก่อน
         const now = new Date();
-        let currentMonthIdx = now.getMonth(); // พฤษภาคม = 4
-        let currentYear = now.getFullYear();  // 2026
+        let currentMonthIdx = now.getMonth(); 
+        let currentYear = now.getFullYear();  
         
-        // 2. คำนวณบวกลบเดือนตรงๆ จากปุ่มกด (currentMonthOffset) ไม่ผ่านวันที่
         currentMonthIdx += currentMonthOffset;
         
-        // ป้องกันกรณีข้ามปี
         if (currentMonthIdx < 0) {
             currentMonthIdx = 11;
             currentYear--;
@@ -398,7 +394,6 @@
             currentYear++;
         }
         
-        // 3. แปลงเป็นชื่อเดือนภาษาไทยและปี พ.ศ.
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const targetMonthName = thaiMonths[currentMonthIdx];
         const targetYearThai = currentYear + 543;
@@ -415,7 +410,6 @@
                 return;
             }
 
-            // ค้นหาแท็บโดยตัดช่องว่างออก
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
             
             if (targetKey && globalAllSheetsData[targetKey]) {
@@ -426,7 +420,7 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (อัปเดตรองรับสีรหัสเวร 1-6 ใหม่)
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -455,6 +449,8 @@
                     if (cellValue === '2') bgStyle += ' background-color: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold;'; 
                     if (cellValue === '3') bgStyle += ' background-color: rgba(34, 197, 94, 0.2); color: #4ade80; font-weight: bold;';  
                     if (cellValue === '4') bgStyle += ' background-color: rgba(249, 115, 22, 0.2); color: #fb923c; font-weight: bold;';  
+                    if (cellValue === '5') bgStyle += ' background-color: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: bold;';  
+                    if (cellValue === '6') bgStyle += ' background-color: rgba(234, 179, 8, 0.2); color: #facc15; font-weight: bold;';  
                     if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
                 }
                 
@@ -479,6 +475,7 @@
         }
     }
 
+    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ของวันนี้ (อัปเดตการจัดกล่องและมัดรวมรายชื่อ 501 รหัส 3, 4, 5, 6 เข้าด้วยกัน)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -500,7 +497,8 @@
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                let dutyPositions = { radioOp: '-', clerk: '-', guard: '-', pos501: '-' };
+                // ปรับตัวแปรมารองรับตำแหน่ง วิทยุ/เสมียน, รักษาสถานที่ และรวมกลุ่ม 501 เข้าเป็น Array
+                let dutyPositions = { radioClerk: '-', guard: '-', pos501: [] };
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
@@ -510,10 +508,11 @@
                     if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ")) continue;
 
                     const dutyType = row[today] ? parseInt(row[today]) : 0;
-                    if (dutyType === 1) dutyPositions.radioOp = staffName;
-                    if (dutyType === 2) dutyPositions.clerk = staffName;
-                    if (dutyType === 3) dutyPositions.guard = staffName;
-                    if (dutyType === 4) dutyPositions.pos501 = staffName;
+                    if (dutyType === 1) dutyPositions.radioClerk = staffName;
+                    if (dutyType === 2) dutyPositions.guard = staffName;
+                    if (dutyType === 3 || dutyType === 4 || dutyType === 5 || dutyType === 6) {
+                        dutyPositions.pos501.push(staffName);
+                    }
                 }
 
                 if (detailsContainer) {
@@ -523,20 +522,16 @@
                             <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> พนักงานวิทยุ (1)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioOp}</span>
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> วิทยุ / เสมียน (1)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioClerk}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-file-pen mr-1 text-purple-400"></i> เสมียนเวร (2)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.clerk}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-green-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-green-400"></i> รักษาสถานที่ (3)</span>
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-purple-400"></i> รักษาสถานที่ (2)</span>
                             <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
                         </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (4)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501}</span>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50 col-span-2">
+                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (3, 4, 5, 6)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501.length > 0 ? dutyPositions.pos501.join(', ') : '-'}</span>
                         </div>
                     `;
                 }
@@ -716,6 +711,5 @@
 
         loadSheetsDataFromAppsScript();
     });
-</script>  
-</body>
-</html>
+</script>
+
