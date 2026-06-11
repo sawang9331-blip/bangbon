@@ -325,6 +325,13 @@
     let currentMonthOffset = 0;
     let pendingData = null;
 
+    // ฟังก์ชันสร้างวันที่สำหรับหน้าสรุปรายงาน (แก้อาการปุ่มกดไม่ติด)
+    function getThaiDate() {
+        const d = new Date();
+        const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        return `วันที่ ${d.getDate()} ${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+    }
+
     function switchTab(tabId) {
         const tabs = document.querySelectorAll('.tab-content');
         tabs.forEach(tab => tab.style.display = 'none');
@@ -427,7 +434,6 @@
         }
     }
 
-    // แก้ไขฟังก์ชันการดึงข้อมูลเพื่อแยกบอร์ดเป็น 4 กล่อง (วิทยุ, รักษาสถานที่, ส่งเอกสาร 7, 501)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -599,5 +605,3 @@
         loadSheetsDataFromAppsScript();
     });
 </script>
-</body>
-</html>
