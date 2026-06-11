@@ -22,29 +22,20 @@
             -webkit-user-select: none;
             user-select: none;
         }
-
-        .tab-content {
-            display: none;
-        }
-
+        .tab-content { display: none; }
         input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
         input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
-        
         .staff-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
         .staff-item { background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
         .staff-item:hover { border-color: #b71c1c; background: #2a2a2a; }
         .staff-item input[type="checkbox"], .staff-item input[type="radio"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #b71c1c; }
-        
         .group-title { margin-top: 20px; font-size: 15px; font-weight: bold; color: #ff8a80; border-left: 4px solid #b71c1c; padding-left: 8px; }
-        
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 999; }
         .nav-item { flex: 1; text-align: center; color: #888; font-size: 11px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item i { font-size: 20px; }
         .nav-item.active { color: #ff5252; font-weight: bold; }
-        
         .btn-submit { background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 25px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .btn-submit:hover { background: linear-gradient(135deg, #f44336, #d32f2f); transform: translateY(-1px); }
-        
         .live-preview-box { background: rgba(30, 30, 30, 0.7); border: 1px dashed #555; padding: 12px; border-radius: 8px; margin-top: 8px; color: #ffb74d; font-family: monospace; font-size: 13px; }
     </style>
 </head>
@@ -60,8 +51,33 @@
                 </div>
                 <span id="today-date-badge" class="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-1 rounded-full border border-zinc-700/50 font-medium">กำลังโหลด...</span>
             </div>
-            <div id="today-duty-details" class="grid grid-cols-2 gap-2">
-                <div class="col-span-2 text-center py-4 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรประจำวัน...</div>
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-zinc-800/40 p-2 rounded border border-zinc-800 col-span-2">
+                    <span class="text-xs text-zinc-500 block">👥 ปฏิบัติหน้าที่ประจำวัน</span>
+                    <span class="font-bold text-zinc-200 text-sm">ตารางเวรประจำวันสถานีบางบอน</span>
+                </div>
+                
+                <div class="bg-zinc-800/40 p-2.5 rounded border border-blue-900/30">
+                    <span class="text-xs text-blue-400 font-medium block mb-1">
+                        <i class="fa-solid fa-walkie-talkie mr-1"></i> วิทยุ / เสมียน (1)
+                    </span>
+                    <span id="home-clerk-box" class="text-zinc-100 font-bold text-base">-</span>
+                </div>
+                
+                <div class="bg-zinc-800/40 p-2.5 rounded border border-purple-900/30">
+                    <span class="text-xs text-purple-400 font-medium block mb-1">
+                        <i class="fa-solid fa-shield-halved mr-1"></i> รักษาสถานที่ (2)
+                    </span>
+                    <span id="home-guard-box" class="text-zinc-100 font-bold text-base">-</span>
+                </div>
+
+                <div class="bg-zinc-800/40 p-2.5 rounded border border-orange-900/40 col-span-2">
+                    <span class="text-xs text-orange-400 font-medium block mb-1">
+                        <i class="fa-solid fa-location-crosshairs mr-1"></i> ตำแหน่ง 501 (3, 4, 5, 6)
+                    </span>
+                    <span id="home-501-box" class="text-zinc-100 font-bold text-base">-</span>
+                </div>
             </div>
         </div>
 
@@ -81,7 +97,7 @@
         </div>
 
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 shadow-xl backdrop-blur-md">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-zinc-800 pb-3 mb-3">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-3 mb-3">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-calendar-days text-amber-500 text-lg"></i>
                     <h2 class="text-base font-bold text-zinc-100 tracking-wide">ตารางปฏิบัติหน้าที่รวม</h2>
@@ -124,26 +140,11 @@
         <div id="lp_fire_place" class="live-preview-box">ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)</div>
 
         <div class="grid grid-cols-2 gap-3 mt-4">
-            <div>
-                <label class="text-zinc-400 block">เวลาได้รับแจ้ง</label>
-                <input type="text" id="f_t1" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลาแจ้งออก</label>
-                <input type="text" id="f_t2" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลา ถึง ว.10</label>
-                <input type="text" id="f_t3" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลา เลิก ว.10</label>
-                <input type="text" id="f_t4" placeholder="--:--">
-            </div>
-            <div class="col-span-2">
-                <label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label>
-                <input type="text" id="f_t5" placeholder="--:--">
-            </div>
+            <div><label class="text-zinc-400 block">เวลาได้รับแจ้ง</label><input type="text" id="f_t1" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลาแจ้งออก</label><input type="text" id="f_t2" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลา ถึง ว.10</label><input type="text" id="f_t3" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลา เลิก ว.10</label><input type="text" id="f_t4" placeholder="--:--"></div>
+            <div class="col-span-2"><label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label><input type="text" id="f_t5" placeholder="--:--"></div>
         </div>
 
         <div class="mt-4">
@@ -187,26 +188,11 @@
         <div id="lp_res_place" class="live-preview-box">ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)</div>
 
         <div class="grid grid-cols-2 gap-3 mt-4">
-            <div>
-                <label class="text-zinc-400 block">เวลาได้รับแจ้ง</label>
-                <input type="text" id="r_t1" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลาแจ้งออก</label>
-                <input type="text" id="r_t2" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลา ถึง ว.10</label>
-                <input type="text" id="r_t3" placeholder="--:--">
-            </div>
-            <div>
-                <label class="text-zinc-400 block">เวลา เลิก ว.10</label>
-                <input type="text" id="r_t4" placeholder="--:--">
-            </div>
-            <div class="col-span-2">
-                <label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label>
-                <input type="text" id="r_t5" placeholder="--:--">
-            </div>
+            <div><label class="text-zinc-400 block">เวลาได้รับแจ้ง</label><input type="text" id="r_t1" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลาแจ้งออก</label><input type="text" id="r_t2" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลา ถึง ว.10</label><input type="text" id="r_t3" placeholder="--:--"></div>
+            <div><label class="text-zinc-400 block">เวลา เลิก ว.10</label><input type="text" id="r_t4" placeholder="--:--"></div>
+            <div class="col-span-2"><label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label><input type="text" id="r_t5" placeholder="--:--"></div>
         </div>
 
         <label class="block mt-4 text-zinc-400">รถยนต์ดับเพลิง/กู้ภัยที่ออกปฏิบัติหน้าที่</label>
@@ -258,26 +244,18 @@
     let pendingData = null;
     let cachedTodayDuty = { radioClerk: '-', guard: '-', pos501: [] };
 
-    // ระบบสลับหน้าต่างแท็บเมนู
     function switchTab(tabId) {
         const tabs = document.querySelectorAll('.tab-content');
         tabs.forEach(tab => tab.style.display = 'none');
-        
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => item.classList.remove('active'));
         
         const targetTab = document.getElementById('tab-' + tabId);
-        if (targetTab) {
-            targetTab.style.display = 'block';
-        }
-        
+        if (targetTab) targetTab.style.display = 'block';
         const targetNav = document.getElementById('nav-' + tabId);
-        if (targetNav) {
-            targetNav.classList.add('active');
-        }
+        if (targetNav) targetNav.classList.add('active');
     }
 
-    // ชั้นที่ 1: ควบคุมปุ่มกด (ล็อกให้ Offset วิ่งได้แค่ -1, 0, 1)
     function changeMonth(offsetDirection) {
         const nextOffset = currentMonthOffset + offsetDirection;
         if (nextOffset >= -1 && nextOffset <= 1) {
@@ -286,46 +264,28 @@
         }
     }
 
-    // ฟังก์ชันคำนวณชื่อเดือนเพื่อเตรียมวาดตาราง
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
         
-        if (currentMonthOffset < -1) currentMonthOffset = -1;
-        if (currentMonthOffset > 1) currentMonthOffset = 1;
-
         const now = new Date();
-        let currentMonthIdx = now.getMonth(); 
+        let currentMonthIdx = now.getMonth() + currentMonthOffset; 
         let currentYear = now.getFullYear();  
         
-        currentMonthIdx += currentMonthOffset;
-        
-        if (currentMonthIdx < 0) {
-            currentMonthIdx = 11;
-            currentYear--;
-        } else if (currentMonthIdx > 11) {
-            currentMonthIdx = 0;
-            currentYear++;
-        }
+        if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
+        else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const targetMonthName = thaiMonths[currentMonthIdx];
-        const targetYearThai = currentYear + 543;
+        const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
         
-        const fullSheetName = targetMonthName + " " + targetYearThai;
-        
-        if (labelEl) {
-            labelEl.innerText = fullSheetName;
-        }
+        if (labelEl) labelEl.innerText = fullSheetName;
 
         if (containerEl) {
             if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
                 return;
             }
-
             let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
-            
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
             } else {
@@ -334,7 +294,6 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -347,7 +306,6 @@
             
             row.forEach((cell, cellIndex) => {
                 let cellValue = cell !== null && cell !== undefined ? cell.toString().trim() : '';
-                
                 if (cellIndex > 0 && cellValue.length > 2) {
                     const matchNumber = cellValue.match(/\d+/);
                     cellValue = matchNumber ? matchNumber[0] : '';
@@ -371,7 +329,6 @@
                 
                 const textAlign = cellIndex === 0 ? 'text-left font-bold px-2 sticky left-0 bg-zinc-900 z-10' : 'text-center';
                 const tag = isHeader ? 'th' : 'td';
-                
                 html += `<${tag} class="${textAlign}" style="${bgStyle}">${cellValue}</${tag}>`;
             });
             html += '</tr>';
@@ -385,22 +342,18 @@
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
         if (inputEl && outEl) {
-            const val = inputEl.value;
-            outEl.innerText = val ? "ตรวจสอบ: " + val : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
+            outEl.innerText = inputEl.value ? "ตรวจสอบ: " + inputEl.value : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
         }
     }
 
-    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ประจำวันเพื่อนำมาปักบนการ์ดด้านบนสุด
+    // ฟังก์ชันดึงเวรประจำวันมาแสดงผลบนการ์ดหน้าโฮม (รวมบานหน้าต่าง 501 สีส้ม)
     async function fetchTodayDuty() {
-        const detailsContainer = document.getElementById('today-duty-details');
+        const clerkBox = document.getElementById('home-clerk-box');
+        const guardBox = document.getElementById('home-guard-box');
+        const box501 = document.getElementById('home-501-box');
         const badgeContainer = document.getElementById('today-date-badge');
         
-        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-            if (detailsContainer) {
-                detailsContainer.innerHTML = `<div class="col-span-2 text-center py-4 text-zinc-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังโหลดข้อมูลตารางเวร...</div>`;
-            }
-            return;
-        }
+        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) return;
 
         try {
             const d = new Date();
@@ -429,26 +382,9 @@
                     }
                 }
 
-                if (detailsContainer) {
-                    detailsContainer.innerHTML = `
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50 col-span-2">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-users mr-1 text-red-400"></i> ปฏิบัติหน้าที่ประจำวัน</span>
-                            <span class="font-bold text-white text-base">ตารางเวรประจำวันสถานีบางบอน</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> วิทยุ / เสมียน (1)</span>
-                            <span class="text-zinc-200 font-bold text-base" id="home-clerk-box">${cachedTodayDuty.radioClerk}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-purple-400"></i> รักษาสถานที่ (2)</span>
-                            <span class="text-zinc-200 font-bold text-base" id="home-guard-box">${cachedTodayDuty.guard}</span>
-                        </div>
-                        <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50 col-span-2">
-                            <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (3, 4, 5, 6)</span>
-                            <span class="text-zinc-200 font-bold text-base" id="home-501-box">${cachedTodayDuty.pos501.length > 0 ? cachedTodayDuty.pos501.join(', ') : '-'}</span>
-                        </div>
-                    `;
-                }
+                if (clerkBox) clerkBox.innerText = cachedTodayDuty.radioClerk;
+                if (guardBox) guardBox.innerText = cachedTodayDuty.guard;
+                if (box501) box501.innerText = cachedTodayDuty.pos501.length > 0 ? cachedTodayDuty.pos501.join(', ') : '-';
                 if (badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
             }
         } catch (error) {
@@ -456,7 +392,6 @@
         }
     }
 
-    // ฟังก์ชันคลิกปุ่มหน้าโฮมด่วน: ให้ดึงชื่อจากเวรประจำวันไปสแกนติ๊กถูกในฟอร์มทันที
     function quickSelectDuty(type) {
         let targets = [];
         if (type === 1 && cachedTodayDuty.radioClerk !== '-') targets.push(cachedTodayDuty.radioClerk);
@@ -476,14 +411,11 @@
                 count++;
             }
         });
-
         alert(`ดึงรายชื่อเข้าสู่แบบฟอร์มสำเร็จ (${count} นาย) โปรดตรวจสอบที่แท็บฟอร์มรายงานครับ`);
     }
 
     function generateStaff() {
-        let htmlTeam = '';
-        let htmlSend = '';
-        
+        let htmlTeam = ''; let htmlSend = '';
         for (let g = 1; g <= 4; g++) {
             htmlTeam += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
             htmlSend += '<div class="group-title">กลุ่มบางบอน ' + g + '-X</div><div class="staff-grid">';
@@ -492,19 +424,12 @@
                 htmlTeam += '<label class="staff-item"><input type="checkbox" class="st-chk" value="' + name + '"> ' + name + '</label>';
                 htmlSend += '<label class="staff-item"><input type="radio" name="sender_radio" value="' + name + '"> ' + name + '</label>';
             }
-            htmlTeam += '</div></div>';
-            htmlSend += '</div></div>';
+            htmlTeam += '</div></div>'; htmlSend += '</div></div>';
         }
-        
-        const fTeam = document.getElementById('fire_team_list');
-        const rTeam = document.getElementById('res_team_list');
-        const fSend = document.getElementById('fire_sender_list');
-        const rSend = document.getElementById('res_sender_list');
-        
-        if (fTeam) fTeam.innerHTML = htmlTeam;
-        if (rTeam) rTeam.innerHTML = htmlTeam;
-        if (fSend) fSend.innerHTML = htmlSend;
-        if (rSend) rSend.innerHTML = htmlSend;
+        document.getElementById('fire_team_list').innerHTML = htmlTeam;
+        document.getElementById('res_team_list').innerHTML = htmlTeam;
+        document.getElementById('fire_sender_list').innerHTML = htmlSend;
+        document.getElementById('res_sender_list').innerHTML = htmlSend;
     }
 
     function getThaiDate() {
@@ -525,22 +450,13 @@
     }
 
     function prepareReport(type) {
-        let text = "";
-        let json = {};
-        const dateStr = getThaiDate();
-
+        let text = ""; let json = {}; const dateStr = getThaiDate();
         if (type === 'fire') {
             const place = document.getElementById('fire_place').value || '-';
             const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
             const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('f_t1').value || '-',
-                2: document.getElementById('f_t2').value || '-',
-                3: document.getElementById('f_t3').value || '-',
-                4: document.getElementById('f_t4').value || '-',
-                5: document.getElementById('f_t5').value || '-'
-            };
+            const t = { 1: document.getElementById('f_t1').value || '-', 2: document.getElementById('f_t2').value || '-', 3: document.getElementById('f_t3').value || '-', 4: document.getElementById('f_t4').value || '-', 5: document.getElementById('f_t5').value || '-' };
 
             text = dateStr + "\nส.ดพ.บางบอน\n🔥 รายงานเหตุเพลิงไหม้\n------------------\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + cars + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
             json = { type: "เพลิงไหม้", date: dateStr, place: place, len: "-", staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: cars };
@@ -552,74 +468,49 @@
             const car = document.getElementById('res_car_single').value || '-';
             const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('r_t1').value || '-',
-                2: document.getElementById('r_t2').value || '-',
-                3: document.getElementById('r_t3').value || '-',
-                4: document.getElementById('r_t4').value || '-',
-                5: document.getElementById('r_t5').value || '-'
-            };
+            const t = { 1: document.getElementById('r_t1').value || '-', 2: document.getElementById('r_t2').value || '-', 3: document.getElementById('r_t3').value || '-', 4: document.getElementById('r_t4').value || '-', 5: document.getElementById('r_t5').value || '-' };
 
             text = dateStr + "\nส.ดพ.บางบอน\n🐾 ช่วยเหลือประชาชน (" + animal + ")\n------------------\n📏 ขนาด: " + size + "\n📍 สถานที่: " + place + "\n⏰ รับแจ้ง: " + t[1] + " น\n⏰ แจ้งออก: " + t[2] + " น\n⏰ ว.10: " + t[3] + " น\n⏰ เลิก ว.10: " + t[4] + " น\n⏰ ว.10 ส.ดพ.: " + t[5] + " น\n🚒 รถที่ออก: " + car + "\n👥 ผู้ปฏิบัติงาน: " + team + "\n📢 ผู้รายงาน: " + sender;
             json = { type: "501 (" + animal + ")", date: dateStr, place: place, len: size, staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: car };
         }
-
         pendingData = { text: text, json: json };
         document.getElementById('previewBody').innerText = text;
         document.getElementById('previewOverlay').style.display = 'flex';
     }
 
-    function closePreview() {
-        document.getElementById('previewOverlay').style.display = 'none';
-    }
+    function closePreview() { document.getElementById('previewOverlay').style.display = 'none'; }
 
     async function sendFinal() {
         if (!pendingData) return;
         const btn = document.getElementById('btnConfirmSend');
-        btn.disabled = true;
-        btn.innerText = "กำลังบันทึก...";
-        const text = pendingData.text;
-        const json = pendingData.json;
+        btn.disabled = true; btn.innerText = "กำลังบันทึก...";
+        const text = pendingData.text; const json = pendingData.json;
 
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch (e) {
-            const el = document.createElement('textarea');
-            el.value = text; document.body.appendChild(el);
-            el.select(); document.execCommand('copy');
-            document.body.removeChild(el);
+        try { await navigator.clipboard.writeText(text); } 
+        catch (e) {
+            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el);
+            el.select(); document.execCommand('copy'); document.body.removeChild(el);
         }
 
         try {
             const response = await fetch(SB_URL, {
                 method: 'POST',
-                headers: {
-                    'apikey': SB_KEY,
-                    'Authorization': 'Bearer ' + SB_KEY,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
+                headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
                 body: JSON.stringify(json)
             });
-
-            if (!response.ok) throw new Error("Server response not OK");
-
+            if (!response.ok) throw new Error("Server error");
             const hint = document.getElementById('copyHint');
             if(hint) hint.classList.remove('hidden');
             setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
-            btn.innerText = "ส่งสำเร็จแล้ว ✅";
-            closePreview();
-            switchTab('home');
+            btn.innerText = "ส่งสำเร็จแล้ว ✅"; closePreview(); switchTab('home');
         } catch (err) {
             console.error(err);
             const hint = document.getElementById('copyHint');
             if(hint) hint.classList.remove('hidden');
             setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
-            closePreview();
-            switchTab('home');
+            closePreview(); switchTab('home');
         } finally {
-            btn.disabled = false;
-            btn.innerText = "ยืนยันการคัดลอก";
+            btn.disabled = false; btn.innerText = "ยืนยันและคัดลอกข้อความ";
         }
     }
 
@@ -633,20 +524,12 @@
                 fetchTodayDuty();
                 renderMonthlySchedule(); 
             }
-        } catch (error) {
-            console.error(error);
-        }
+        } catch (error) { console.error(error); }
     }
 
     window.addEventListener("load", () => {
         generateStaff();
         switchTab('home'); 
-        
-        const dateEl = document.getElementById('current-date');
-        if (dateEl) {
-            dateEl.innerText = getThaiDate();
-        }
-
         loadSheetsDataFromAppsScript();
     });
 </script>
