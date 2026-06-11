@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.3.4</title>
+    <title>ส.ดพ.บางบอน V3.3.5</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,7 +27,7 @@
             display: none;
         }
 
-        input, select { width: 100%; padding: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
         input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
         
         .staff-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
@@ -51,6 +51,7 @@
 <body>
 
     <div id="tab-home" class="tab-content max-w-4xl mx-auto p-4">
+        
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 shadow-xl mb-4 backdrop-blur-md">
             <div class="flex justify-between items-center border-b border-zinc-800 pb-2.5 mb-3">
                 <div class="flex items-center gap-2">
@@ -62,6 +63,21 @@
             <div id="today-duty-details" class="grid grid-cols-2 gap-2">
                 <div class="col-span-2 text-center py-4 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรประจำวัน...</div>
             </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 mb-4">
+            <button onclick="quickSelectDuty(1)" class="bg-zinc-900/80 border border-zinc-800/80 hover:border-blue-500/50 p-3 rounded-xl flex flex-col items-center justify-center gap-1 transition shadow-lg backdrop-blur-sm">
+                <i class="fa-solid fa-walkie-talkie text-blue-400 text-lg"></i>
+                <span class="text-[11px] text-zinc-400">ดึง วิทยุ (1)</span>
+            </button>
+            <button onclick="quickSelectDuty(2)" class="bg-zinc-900/80 border border-zinc-800/80 hover:border-purple-500/50 p-3 rounded-xl flex flex-col items-center justify-center gap-1 transition shadow-lg backdrop-blur-sm">
+                <i class="fa-solid fa-shield-halved text-purple-400 text-lg"></i>
+                <span class="text-[11px] text-zinc-400">ดึง สถานที่ (2)</span>
+            </button>
+            <button onclick="quickSelectDuty(501)" class="bg-zinc-900/80 border border-zinc-800/80 hover:border-orange-500/50 p-3 rounded-xl flex flex-col items-center justify-center gap-1 transition shadow-lg backdrop-blur-sm">
+                <i class="fa-solid fa-location-crosshairs text-orange-400 text-lg"></i>
+                <span class="text-[11px] text-zinc-400">ดึง 501 (3-6)</span>
+            </button>
         </div>
 
         <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 shadow-xl backdrop-blur-md">
@@ -240,6 +256,7 @@
     let globalAllSheetsData = {}; 
     let currentMonthOffset = 0;
     let pendingData = null;
+    let cachedTodayDuty = { radioClerk: '-', guard: '-', pos501: [] };
 
     // ระบบสลับหน้าต่างแท็บเมนู
     function switchTab(tabId) {
@@ -317,7 +334,7 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (อัปเดตรองรับสีรหัสเวร 1-6 และ ส ใหม่)
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -373,7 +390,7 @@
         }
     }
 
-    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ของวันนี้ (มัดรวมรายชื่อ 501 รหัส 3, 4, 5, 6 เข้าด้วยกัน)
+    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ประจำวันเพื่อนำมาปักบนการ์ดด้านบนสุด
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -395,7 +412,7 @@
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                let dutyPositions = { radioClerk: '-', guard: '-', pos501: [] };
+                cachedTodayDuty = { radioClerk: '-', guard: '-', pos501: [] };
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
@@ -405,10 +422,10 @@
                     if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ")) continue;
 
                     const dutyType = row[today] ? parseInt(row[today]) : 0;
-                    if (dutyType === 1) dutyPositions.radioClerk = staffName;
-                    if (dutyType === 2) dutyPositions.guard = staffName;
+                    if (dutyType === 1) cachedTodayDuty.radioClerk = staffName;
+                    if (dutyType === 2) cachedTodayDuty.guard = staffName;
                     if (dutyType === 3 || dutyType === 4 || dutyType === 5 || dutyType === 6) {
-                        dutyPositions.pos501.push(staffName);
+                        cachedTodayDuty.pos501.push(staffName);
                     }
                 }
 
@@ -420,15 +437,15 @@
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-zinc-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-walkie-talkie mr-1 text-blue-400"></i> วิทยุ / เสมียน (1)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.radioClerk}</span>
+                            <span class="text-zinc-200 font-bold text-base" id="home-clerk-box">${cachedTodayDuty.radioClerk}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-purple-400"></i> รักษาสถานที่ (2)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
+                            <span class="text-zinc-200 font-bold text-base" id="home-guard-box">${cachedTodayDuty.guard}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50 col-span-2">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (3, 4, 5, 6)</span>
-                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.pos501.length > 0 ? dutyPositions.pos501.join(', ') : '-'}</span>
+                            <span class="text-zinc-200 font-bold text-base" id="home-501-box">${cachedTodayDuty.pos501.length > 0 ? cachedTodayDuty.pos501.join(', ') : '-'}</span>
                         </div>
                     `;
                 }
@@ -437,6 +454,30 @@
         } catch (error) {
             console.error(error);
         }
+    }
+
+    // ฟังก์ชันคลิกปุ่มหน้าโฮมด่วน: ให้ดึงชื่อจากเวรประจำวันไปสแกนติ๊กถูกในฟอร์มทันที
+    function quickSelectDuty(type) {
+        let targets = [];
+        if (type === 1 && cachedTodayDuty.radioClerk !== '-') targets.push(cachedTodayDuty.radioClerk);
+        if (type === 2 && cachedTodayDuty.guard !== '-') targets.push(cachedTodayDuty.guard);
+        if (type === 501) targets = [...cachedTodayDuty.pos501];
+
+        if (targets.length === 0) {
+            alert("ไม่พบรายชื่อในระบบเวรประจำวันเพื่อดึงข้อมูลด่วน");
+            return;
+        }
+
+        const chkBoxes = document.querySelectorAll('.st-chk');
+        let count = 0;
+        chkBoxes.forEach(box => {
+            if (targets.includes(box.value)) {
+                box.checked = true;
+                count++;
+            }
+        });
+
+        alert(`ดึงรายชื่อเข้าสู่แบบฟอร์มสำเร็จ (${count} นาย) โปรดตรวจสอบที่แท็บฟอร์มรายงานครับ`);
     }
 
     function generateStaff() {
