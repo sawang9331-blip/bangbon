@@ -22,318 +22,215 @@
             -webkit-user-select: none;
             user-select: none;
         }
-        
+
         .tab-content {
             display: none;
         }
 
-        input, select { width: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
+        input, select { width: 100%; padding: 100%; padding: 12px; margin-top: 5px; background-color: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: #fff; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
         input:focus, select:focus { border-color: #b71c1c; outline: none; background-color: #333; }
         
-        .live-review-box { margin-top: 8px; padding: 10px; background: #071408; border-left: 3px solid #00ff41; font-family: monospace; font-size: 0.85em; color: #00ff41; border-radius: 4px; }
-        .staff-selector { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #333; }
-        .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .staff-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; background: #262626; padding: 8px; border-radius: 6px; border: 1px solid #333; }
-        .staff-item input { width: auto; margin-top: 0; transform: scale(1.2); }
-        .group-title { font-size: 0.8em; color: #ffd740; margin: 12px 0 6px 0; border-bottom: 1px dashed #333; padding-bottom: 2px; font-weight: bold; }
+        .staff-grid { display: grid; grid-template-cols: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+        .staff-item { background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
+        .staff-item:hover { border-color: #b71c1c; background: #2a2a2a; }
+        .staff-item input[type="checkbox"], .staff-item input[type="radio"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: #b71c1c; }
         
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e1e1e; height: 65px; display: flex; border-top: 1px solid #333; z-index: 9999; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 0.75em; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        .nav-item.active { color: #ff5252; }
-        .nav-item i { font-size: 1.4em; margin-bottom: 3px; }
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
-        .modal-container { background: #1e1e1e; padding: 20px; border-radius: 16px; width: 100%; max-width: 450px; border: 1px solid #444; max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-body { overflow-y: auto; flex-grow: 1; margin: 15px 0; background: #000; color: #00ff41; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; white-space: pre-wrap; font-size: 0.95em; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .group-title { margin-top: 20px; font-size: 15px; font-weight: bold; color: #ff8a80; border-left: 4px solid #b71c1c; padding-left: 8px; }
+        
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #333; z-index: 999; }
+        .nav-item { flex: 1; text-align: center; color: #888; font-size: 11px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #ff5252; font-weight: bold; }
+        
+        .btn-submit { background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 25px; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .btn-submit:hover { background: linear-gradient(135deg, #f44336, #d32f2f); transform: translateY(-1px); }
+        
+        .live-preview-box { background: rgba(30, 30, 30, 0.7); border: 1px dashed #555; padding: 12px; border-radius: 8px; margin-top: 8px; color: #ffb74d; font-family: monospace; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="app-header p-4 flex items-center justify-between text-white">
-    <div class="flex items-center gap-3">
-        <span class="text-2xl">🚒</span>
-        <div>
-            <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V3.3.4</p>
+    <div id="tab-home" class="tab-content max-w-4xl mx-auto p-4">
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 shadow-xl mb-4 backdrop-blur-md">
+            <div class="flex justify-between items-center border-b border-zinc-800 pb-2.5 mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                    <h2 class="text-lg font-bold text-zinc-100 tracking-wide">เวรปฏิบัติหน้าที่ประจำวันนี้</h2>
+                </div>
+                <span id="today-date-badge" class="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-1 rounded-full border border-zinc-700/50 font-medium">กำลังโหลด...</span>
+            </div>
+            <div id="today-duty-details" class="grid grid-cols-2 gap-2">
+                <div class="col-span-2 text-center py-4 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรประจำวัน...</div>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 shadow-xl backdrop-blur-md">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-zinc-800 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-amber-500 text-lg"></i>
+                    <h2 class="text-base font-bold text-zinc-100 tracking-wide">ตารางปฏิบัติหน้าที่รวม</h2>
+                </div>
+                <div class="flex items-center bg-zinc-800 rounded-lg p-0.5 border border-zinc-700/60 shadow-inner">
+                    <button onclick="changeMonth(-1)" class="px-2.5 py-1 text-zinc-400 hover:text-white transition rounded-md hover:bg-zinc-700/50"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <span id="current-view-month-label" class="text-xs font-bold text-amber-400 px-3 min-w-[110px] text-center tracking-wide">กำลังคำนวณ...</span>
+                    <button onclick="changeMonth(1)" class="px-2.5 py-1 text-zinc-400 hover:text-white transition rounded-md hover:bg-zinc-700/50"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+            </div>
+
+            <div id="sheet-data-container" class="w-full">
+                <div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังเปิดการเชื่อมต่อฐานข้อมูล...</div>
+            </div>
+
+            <div class="mt-4 bg-zinc-950/40 p-3 rounded-lg border border-zinc-800/80">
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-blue-500 rounded mr-1.5"></span> 1 = วิทยุ / เสมียน</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-purple-500 rounded mr-1.5"></span> 2 = รักษาสถานที่</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-green-500 rounded mr-1.5"></span> 3 = 501</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-orange-500 rounded mr-1.5"></span> 4 = 501</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-red-500 rounded mr-1.5"></span> 5 = 501</div>
+                    <div class="flex items-center"><span class="w-2.5 h-2.5 bg-yellow-500 rounded mr-1.5"></span> 6 = 501</div>
+                    <div class="flex items-center col-span-2 text-zinc-300 border-t border-zinc-800/60 pt-1.5 mt-0.5 font-bold">
+                        <span class="w-2.5 h-2.5 bg-rose-500 rounded mr-1.5"></span> ส = ส่งเอกสารงานธุรการ
+                    </div>
+                    <div class="flex items-center col-span-2 text-zinc-400 pt-0.5">
+                        พ = เวรพัก | ช = เวรเช้า (08:00 น.) | ต = เวรดึก (20:00 น.)
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
-</div>
 
-<div class="p-4 max-w-xl mx-auto">
-
-    <div id="tab-home" class="tab-content">
-        <div class="bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 rounded-2xl mb-4 border border-zinc-700 text-center shadow-lg">
-            <p class="text-zinc-400 text-sm">ระบบบันทึกรายงานการปฏิบัติงาน</p>
-            <h2 class="text-xl font-bold mt-1 text-white">ส.ดพ.บางบอน (สปภ. กทม.)</h2>
-        </div>
+    <div id="tab-fire" class="tab-content max-w-2xl mx-auto p-4 bg-zinc-900/80 rounded-xl my-4 border border-zinc-800">
+        <h2 class="text-xl font-bold text-red-500 border-b border-zinc-700 pb-2"><i class="fa-solid fa-fire mr-2"></i>รายงานเหตุเพลิงไหม้</h2>
         
-        <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">เลือกประเภทงานเพื่อบันทึก</p>
-        <div class="grid grid-cols-1 gap-3">
-            <button type="button" onclick="switchTab('fire')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-red-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
-                <div class="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center text-red-500 text-xl"><i class="fa-solid fa-fire"></i></div>
-                <div>
-                    <h3 class="font-bold text-white text-base">รายงานเหตุเพลิงไหม้</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">บันทึกเพลิงไหม้อาคาร หญ้า และยานพาหนะ</p>
-                </div>
-            </button>
-            
-            <button type="button" onclick="switchTab('rescue')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-yellow-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
-                <div class="w-12 h-12 rounded-lg bg-yellow-600/20 flex items-center justify-center text-yellow-500 text-xl"><i class="fa-solid fa-snake"></i></div>
-                <div>
-                    <h3 class="font-bold text-white text-base">ช่วยเหลือประชาชน / 501</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">จับงู, ตัวเงินตัวทอง, และบรรเทาภัยอื่นๆ</p>
-                </div>
-            </button>
+        <label class="block mt-4 text-zinc-400">สถานที่เกิดเหตุ</label>
+        <input type="text" id="fire_place" placeholder="ระบุสถานที่เกิดเหตุ..." oninput="updateLivePreview('fire_place', 'lp_fire_place')">
+        <div id="lp_fire_place" class="live-preview-box">ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)</div>
 
-            <button type="button" onclick="switchTab('schedule')" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-teal-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer">
-                <div class="w-12 h-12 rounded-lg bg-teal-600/20 flex items-center justify-center text-teal-400 text-xl"><i class="fa-solid fa-calendar-days"></i></div>
-                <div>
-                    <h3 class="font-bold text-white text-base">ตารางเวรปฏิบัติหน้าที่</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">ตรวจสอบตารางเวรรายวันแบบกระจายตำแหน่ง 501</p>
-                </div>
-            </button>
-
-            <a href="https://www.bfrd199.com/map-disaster" target="_blank" class="flex items-center gap-4 bg-zinc-900 p-4 rounded-xl border border-blue-900/40 hover:bg-zinc-800 text-left transition w-full cursor-pointer" style="text-decoration: none;">
-                <div class="w-12 h-12 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 text-xl"><i class="fa-solid fa-map-location-dot"></i></div>
-                <div>
-                    <h3 class="font-bold text-white text-base">แผนที่สาธารณภัย (สปภ.)</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">ระบบฐานข้อมูลภูมิสารสนเทศและแผนที่แจ้งเหตุส่วนกลาง</p>
-                </div>
-            </a>
+        <div class="grid grid-cols-2 gap-3 mt-4">
+            <div>
+                <label class="text-zinc-400 block">เวลาได้รับแจ้ง</label>
+                <input type="text" id="f_t1" placeholder="--:--">
+            </div>
+            <div>
+                <label class="text-zinc-400 block">เวลาแจ้งออก</label>
+                <input type="text" id="f_t2" placeholder="--:--">
+            </div>
+            <div>
+                <label class="text-zinc-400 block">เวลา ถึง ว.10</label>
+                <input type="text" id="f_t3" placeholder="--:--">
+            </div>
+            <div>
+                <label class="text-zinc-400 block">เวลา เลิก ว.10</label>
+                <input type="text" id="f_t4" placeholder="--:--">
+            </div>
+            <div class="col-span-2">
+                <label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label>
+                <input type="text" id="f_t5" placeholder="--:--">
+            </div>
         </div>
+
+        <div class="mt-4">
+            <label class="text-zinc-400 block">รถดับเพลิงที่ออกปฏิบัติหน้าที่</label>
+            <div class="grid grid-cols-3 gap-2 mt-1">
+                <input type="text" id="fire_car1" placeholder="รถคันที่ 1" class="!mt-0">
+                <input type="text" id="fire_car2" placeholder="รถคันที่ 2" class="!mt-0">
+                <input type="text" id="fire_car3" placeholder="รถคันที่ 3" class="!mt-0">
+            </div>
+        </div>
+
+        <label class="block mt-6 text-zinc-300 font-bold">เลือกรายชื่อเจ้าหน้าที่ผู้ปฏิบัติงาน</label>
+        <div id="fire_team_list"></div>
+
+        <label class="block mt-6 text-zinc-300 font-bold">เลือกรายชื่อผู้รายงานเหตุ</label>
+        <div id="fire_sender_list"></div>
+
+        <button onclick="prepareReport('fire')" class="btn-submit">ตรวจสอบรายงานเหตุเพลิงไหม้</button>
     </div>
 
-    <div id="tab-fire" class="tab-content">
-        <div class="flex items-center gap-2 mb-4 border-b border-zinc-800 pb-2">
-            <i class="fa-solid fa-fire text-red-500 text-xl"></i>
-            <h2 class="text-lg font-bold text-white">บันทึกเหตุเพลิงไหม้</h2>
-        </div>
+    <div id="tab-rescue" class="tab-content max-w-2xl mx-auto p-4 bg-zinc-900/80 rounded-xl my-4 border border-zinc-800">
+        <h2 class="text-xl font-bold text-green-500 border-b border-zinc-700 pb-2"><i class="fa-solid fa-handshake-angle mr-2"></i>รายงานช่วยเหลือประชาชน (501)</h2>
         
-        <div class="space-y-4">
-            <div>
-                <label>📍 สถานที่เกิดเหตุ</label>
-                <input type="text" id="fire_place" placeholder="ระบุสถานที่..." oninput="updateLivePreview('fire_place', 'lp_fire_place')">
-                <div id="lp_fire_place" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุสถานที่)</div>
-            </div>
-            
-            <div>
-                <label>🚒 รถที่ออกเหตุ (เลือกตามลำดับ)</label>
-                <div class="grid grid-cols-3 gap-2 mt-1">
-                    <select id="fire_car1"><option value="">-- รถ 1 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 061-2">061-2</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                    <select id="fire_car2"><option value="">-- รถ 2 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 061-2">061-2</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                    <select id="fire_car3"><option value="">-- รถ 3 --</option><option value="รถบางบอน 061-1">061-1</option><option value="รถบางบอน 061-2">061-2</option><option value="รถบางบอน 046-1">046-1</option><option value="รถบางบอน 041-1">041-1</option><option value="รถบางบอน 051-1">051-1</option><option value="รถบางบอน 052-1">052-1</option><option value="รถบางบอน 053-1">053-1</option></select>
-                </div>
-            </div>
+        <label class="block mt-4 text-zinc-400">ประเภทเหตุช่วยเหลือ</label>
+        <select id="res_type_text" onchange="toggleOther()">
+            <option value="จับงู">จับงู</option>
+            <option value="กำจัดรังผึ้ง">กำจัดรังผึ้ง</option>
+            <option value="กำจัดรังต่อ">กำจัดรังต่อ</option>
+            <option value="กำจัดรังแตน">กำจัดรังแตน</option>
+            <option value="จับตัวเงินตัวทอง">จับตัวเงินตัวทอง</option>
+            <option value="เหตุอื่นๆ">เหตุอื่นๆ (โปรดระบุเองด้านล่าง)</option>
+        </select>
+        <input type="text" id="res_type_other" placeholder="ระบุประเภทเหตุอื่นๆ..." style="display:none;" oninput="updateLivePreview('res_type_other', 'lp_res_type')">
+        <div id="lp_res_type" class="live-preview-box" style="display:none;">ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)</div>
 
+        <label class="block mt-4 text-zinc-400">ขนาด / ความยาว (เช่น 1 เมตร หรือ รังขนาด 30 ซม.)</label>
+        <input type="text" id="res_len_text" placeholder="ระบุขนาดสิ่งกีดขวางหรือสัตว์ร้าย...">
+
+        <label class="block mt-4 text-zinc-400">สถานที่เกิดเหตุ</label>
+        <input type="text" id="res_place" placeholder="ระบุสถานที่เกิดเหตุ..." oninput="updateLivePreview('res_place', 'lp_res_place')">
+        <div id="lp_res_place" class="live-preview-box">ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)</div>
+
+        <div class="grid grid-cols-2 gap-3 mt-4">
             <div>
-                <label>⏰ บันทึกเวลาปฏิบัติการ</label>
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                    <div><span class="text-xs text-zinc-400">รับแจ้ง</span><input type="time" id="f_t1"></div>
-                    <div><span class="text-xs text-zinc-400">แจ้งออก</span><input type="time" id="f_t2"></div>
-                    <div><span class="text-xs text-zinc-400">ว.10 หน้างาน</span><input type="time" id="f_t3"></div>
-                    <div><span class="text-xs text-zinc-400">เลิก ว.10</span><input type="time" id="f_t4"></div>
-                </div>
-                <div class="mt-2"><span class="text-xs text-zinc-400">ว.10 กลับถึง ส.ดพ.</span><input type="time" id="f_t5"></div>
+                <label class="text-zinc-400 block">เวลาได้รับแจ้ง</label>
+                <input type="text" id="r_t1" placeholder="--:--">
             </div>
-            
             <div>
-                <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
-                <div class="staff-selector"><div id="fire_team_list">กำลังโหลดรายชื่อ...</div></div>
+                <label class="text-zinc-400 block">เวลาแจ้งออก</label>
+                <input type="text" id="r_t2" placeholder="--:--">
             </div>
-            
             <div>
-                <label>📢 ผู้รายงานเหตุ</label>
-                <div class="staff-selector"><div id="fire_sender_list">กำลังโหลดรายชื่อ...</div></div>
+                <label class="text-zinc-400 block">เวลา ถึง ว.10</label>
+                <input type="text" id="r_t3" placeholder="--:--">
             </div>
-            
-            <button type="button" class="w-full bg-red-600 text-white p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('fire')">
-                <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานเพลิงไหม้
-            </button>
+            <div>
+                <label class="text-zinc-400 block">เวลา เลิก ว.10</label>
+                <input type="text" id="r_t4" placeholder="--:--">
+            </div>
+            <div class="col-span-2">
+                <label class="text-zinc-400 block">เวลา กลับถึง ส.ดพ.บางบอน</label>
+                <input type="text" id="r_t5" placeholder="--:--">
+            </div>
+        </div>
+
+        <label class="block mt-4 text-zinc-400">รถยนต์ดับเพลิง/กู้ภัยที่ออกปฏิบัติหน้าที่</label>
+        <input type="text" id="res_car_single" placeholder="เช่น บางบอน 501 / รถจักรยานยนต์">
+
+        <label class="block mt-6 text-zinc-300 font-bold">เลือกรายชื่อเจ้าหน้าที่ผู้ปฏิบัติงาน</label>
+        <div id="res_team_list"></div>
+
+        <label class="block mt-6 text-zinc-300 font-bold">เลือกรายชื่อผู้รายงานเหตุ</label>
+        <div id="res_sender_list"></div>
+
+        <button onclick="prepareReport('rescue')" class="btn-submit">ตรวจสอบรายงานช่วยระงับเหตุ</button>
+    </div>
+
+    <div class="nav-bar">
+        <div id="nav-home" class="nav-item active" onclick="switchTab('home')">
+            <i class="fa-solid fa-table-list"></i>ตารางเวร
+        </div>
+        <div id="nav-fire" class="nav-item" onclick="switchTab('fire')">
+            <i class="fa-solid fa-fire-flame-curved"></i>รายงานเพลิงไหม้
+        </div>
+        <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')">
+            <i class="fa-solid fa-kit-medical"></i>รายงาน 501
         </div>
     </div>
 
-    <div id="tab-rescue" class="tab-content">
-        <div class="flex items-center gap-2 mb-4 border-b border-zinc-800 pb-2">
-            <i class="fa-solid fa-handshake-angle text-yellow-500 text-xl"></i>
-            <h2 class="text-lg font-bold text-white">บันทึกช่วยเหลือประชาชน</h2>
-        </div>
-        
-        <div class="space-y-4">
-            <div>
-                <label>🐾 ชนิดสัตว์ / ประเภทเหตุ</label>
-                <select id="res_type_text" onchange="toggleOther()">
-                    <option value="งูเหลือม">🐍 งูเหลือม</option>
-                    <option value="งูเห่า">🐍 งูเห่า</option>
-                    <option value="ตัวเงินตัวทอง">🦎 ตัวเงินตัวทอง</option>
-                    <option value="เหตุอื่นๆ">🛠️ เหตุอื่นๆ</option>
-                </select>
-                <input type="text" id="res_type_other" style="display:none; margin-top:10px;" placeholder="ระบุเหตุอื่นๆ" oninput="updateLivePreview('res_type_other', 'lp_res_type')">
-                <div id="lp_res_type" class="live-review-box" style="display:none;"></div>
-            </div>
-
-            <div>
-                <label>📏 ขนาด / จำนวน</label>
-                <input type="text" id="res_len_text" placeholder="เช่น 2 เมตร หรือ 1 ตัว" oninput="updateLivePreview('res_len_text', 'lp_res_len')">
-                <div id="lp_res_len" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุขนาด)</div>
-            </div>
-
-            <div>
-                <label>📍 สถานที่เกิดเหตุ</label>
-                <input type="text" id="res_place" placeholder="บ้านเลขที่, ซอย, ถนน..." oninput="updateLivePreview('res_place', 'lp_res_place')">
-                <div id="lp_res_place" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุสถานที่)</div>
-            </div>
-            
-            <div>
-                <label>🚒 รถที่ออกเหตุ</label>
-                <select id="res_car_single">
-                    <option value="">-- เลือกคันรถ --</option>
-                    <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
-                    <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
-                    <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
-                    <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
-                    <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
-                    <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
-                    <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
-                    <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
-                </select>
-            </div>
-
-            <div>
-                <label>⏰ บันทึกเวลาปฏิบัติการ</label>
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                    <div><span class="text-xs text-zinc-400">รับแจ้ง</span><input type="time" id="r_t1"></div>
-                    <div><span class="text-xs text-zinc-400">แจ้งออก</span><input type="time" id="r_t2"></div>
-                    <div><span class="text-xs text-zinc-400">ว.10 หน้างาน</span><input type="time" id="r_t3"></div>
-                    <div><span class="text-xs text-zinc-400">เลิก ว.10</span><input type="time" id="r_t4"></div>
-                </div>
-                <div class="mt-2"><span class="text-xs text-zinc-400">ว.10 กลับถึง ส.ดพ.</span><input type="time" id="r_t5"></div>
-            </div>
-
-            <div>
-                <label>👥 ผู้ปฏิบัติหน้าที่ (ติ๊กเลือก)</label>
-                <div class="staff-selector"><div id="res_team_list">กำลังโหลดรายชื่อ...</div></div>
-            </div>
-
-            <div>
-                <label>📢 ผู้รายงานเหตุ</label>
-                <div class="staff-selector"><div id="res_sender_list">กำลังโหลดรายชื่อ...</div></div>
-            </div>
-
-            <button type="button" class="w-full bg-amber-500 text-black p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('rescue')">
-                <i class="fa-solid fa-file-signature mr-2"></i> ตรวจสอบรายงานการช่วยเหลือ
-            </button>
-        </div>
-    </div>
-
-    <div id="tab-schedule" class="tab-content">
-        <div class="flex items-center gap-2 mb-3 border-b border-zinc-800 pb-2">
-            <i class="fa-solid fa-calendar-days text-teal-400 text-xl"></i>
-            <h2 class="text-lg font-bold text-white">ตารางเวรปฏิบัติหน้าที่</h2>
-        </div>
-
-        <div class="bg-zinc-900 border border-teal-500/30 rounded-xl p-4 mb-4 shadow-md">
-            <div class="flex justify-between items-center border-b border-zinc-800 pb-2 mb-3">
-                <span class="text-sm font-bold text-teal-400 flex items-center gap-1">
-                    <i class="fa-solid fa-star animate-pulse"></i> เวรปฏิบัติหน้าที่ประจำวันนี้
-                </span>
-                <span id="today-date-badge" class="text-xs bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">กำลังโหลด...</span>
-            </div>
-            
-            <div id="today-duty-details" class="grid grid-cols-2 gap-3 text-sm">
-                <div class="col-span-2 text-center py-4 text-zinc-500">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรวันนี้จากระบบ...
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4 shadow-md">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
-                <span class="text-sm font-bold text-amber-400 flex items-center gap-1">
-                    <i class="fa-solid fa-calendar-days"></i> เลือกดูตารางเวรประจำเดือน
-                </span>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="changeMonth(-1)" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
-                        <i class="fa-solid fa-chevron-left"></i> เดือนก่อนหน้า
-                    </button>
-                    <span id="current-view-month-label" class="bg-zinc-950 px-4 py-1.5 rounded-lg text-xs font-bold text-white border border-zinc-800 min-w-[120px] text-center">
-                        กำลังโหลด...
-                    </span>
-                    <button type="button" onclick="changeMonth(1)" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
-                        เดือนถัดไป <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-1">ตารางเวรรวมทั้งหมด (เลื่อนดูด้านล่างได้)</p>
-        <div class="w-full overflow-auto rounded-xl bg-zinc-900 border border-zinc-800 mb-2" style="height: calc(100vh - 440px);">
-            <div id="sheet-data-container" class="w-full text-zinc-300 text-xs p-1">
-                <div class="text-center py-8 text-zinc-500">
-                    <i class="fa-solid fa-spinner fa-spin mr-2"></i>ระบบกำลังเตรียมข้อมูลตารางเวร...
-                </div>
-            </div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-300 shadow-lg">
-            <h3 class="text-amber-400 font-bold mb-2 border-b border-zinc-800 pb-1 text-xs flex items-center gap-1">
-                <i class="fa-solid fa-circle-info"></i> หมายเหตุสัญลักษณ์ปฏิบัติหน้าที่
-            </h3>
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-blue-500 rounded mr-1.5"></span> 1 = พนักงานวิทยุ</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-purple-500 rounded mr-1.5"></span> 2 = เสมียนเวร</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-green-500 rounded mr-1.5"></span> 3 = รักษาสถานที่</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-orange-500 rounded mr-1.5"></span> 4 = ตำแหน่ง 501</div>
-                <div class="flex items-center col-span-2 text-zinc-400 border-t border-zinc-800/60 pt-1.5 mt-0.5">
-                    พ = เวรพัก | ช = เวรเช้า (08:00 น.) | ต = เวรดึก (20:00 น.)
-                </div>
+    <div id="previewOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+        <div class="bg-zinc-900 border border-zinc-700 w-full max-w-md rounded-xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
+            <h3 class="text-base font-bold text-amber-400 border-b border-zinc-700 pb-2 mb-3"><i class="fa-solid fa-magnifying-glass mr-2"></i>ตรวจสอบรายงานขั้นตอนสุดท้ายก่อนคัดลอก</h3>
+            <div class="overflow-y-auto flex-1 bg-zinc-950 p-3 rounded-lg border border-zinc-800 text-sm text-green-400 whitespace-pre-wrap font-mono select-text" id="previewBody"></div>
+            <div class="mt-4 flex gap-3">
+                <button onclick="closePreview()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-3 rounded-lg text-sm transition">แก้ไขข้อมูล</button>
+                <button id="btnConfirmSend" onclick="sendFinal()" class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-3 rounded-lg text-sm transition shadow-lg">ยืนยันและคัดลอกข้อความ</button>
             </div>
         </div>
     </div>
 
-</div>
-
-<div class="nav-bar">
-    <div id="nav-home" class="nav-item" onclick="switchTab('home')">
-        <i class="fa-solid fa-house"></i>
-        <span>หน้าแรก</span>
+    <div id="copyHint" class="hidden fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-5 py-3 rounded-full font-bold shadow-2xl z-[10000] border border-green-400 text-center text-sm tracking-wide">
+        คัดลอกรายงานลงคลิปบอร์ด และอัปเดตลงฐานข้อมูลเรียบร้อยแล้ว! ✅
     </div>
-    <div id="nav-fire" class="nav-item" onclick="switchTab('fire')">
-        <i class="fa-solid fa-fire"></i>
-        <span>เพลิงไหม้</span>
-    </div>
-    <div id="nav-rescue" class="nav-item" onclick="switchTab('rescue')">
-        <i class="fa-solid fa-handshake-angle"></i>
-        <span>ช่วยเหลือ</span>
-    </div>
-    <div id="nav-schedule" class="nav-item" onclick="switchTab('schedule')">
-        <i class="fa-solid fa-calendar-days"></i>
-        <span>ตารางเวร</span>
-    </div>
-</div>
-
-<div id="previewOverlay" class="overlay">
-    <div class="modal-container">
-        <h3 class="text-base font-bold text-white border-b border-zinc-700 pb-2 flex items-center gap-2">
-            <i class="fa-solid fa-square-check text-green-500"></i> ตรวจสอบรายงานขั้นสุดท้าย
-        </h3>
-        <div id="previewBody" class="modal-body"></div>
-        <div class="flex gap-3">
-            <button type="button" id="btnClosePreview" onclick="closePreview()" class="flex-1 bg-zinc-700 hover:bg-zinc-600 p-3 rounded-xl font-bold text-sm text-white cursor-pointer">
-                กลับไปแก้ไข
-            </button>
-            <button type="button" id="btnConfirmSend" onclick="sendFinal()" class="flex-1 bg-green-600 hover:bg-green-500 p-3 rounded-xl font-bold text-sm text-white shadow-md cursor-pointer">
-                ยืนยันการคัดลอก
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="copyHint" class="fixed top-5 left-5 right-5 bg-green-600 text-white p-3 rounded-xl font-bold text-center z-50 shadow-xl hidden animate-bounce">
-    <i class="fa-solid fa-circle-check mr-2"></i> บันทึกและคัดลอกข้อความเรียบร้อย! นำไปวางในไลน์ได้เลย
-</div>
 
 <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-QHce4OyFVcCBSyNcmhejiQ7Ovze0C11kY3Y44pzL2FL8HlijZ7oVEFIBwzhnUxNC/exec";
@@ -420,7 +317,7 @@
         }
     }
 
-    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (อัปเดตรองรับสีรหัสเวร 1-6 ใหม่)
+    // ฟังก์ชันสร้างโครงสร้างตาราง HTML แบบ Dark Mode (อัปเดตรองรับสีรหัสเวร 1-6 และ ส ใหม่)
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
         if (!container || !matrix || matrix.length === 0) return;
@@ -452,6 +349,7 @@
                     if (cellValue === '5') bgStyle += ' background-color: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: bold;';  
                     if (cellValue === '6') bgStyle += ' background-color: rgba(234, 179, 8, 0.2); color: #facc15; font-weight: bold;';  
                     if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
+                    if (cellValue === 'ส') bgStyle += ' background-color: rgba(244, 63, 94, 0.25); color: #fb7185; font-weight: bold;'; 
                 }
                 
                 const textAlign = cellIndex === 0 ? 'text-left font-bold px-2 sticky left-0 bg-zinc-900 z-10' : 'text-center';
@@ -475,7 +373,7 @@
         }
     }
 
-    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ของวันนี้ (อัปเดตการจัดกล่องและมัดรวมรายชื่อ 501 รหัส 3, 4, 5, 6 เข้าด้วยกัน)
+    // ฟังก์ชันคำนวณเวรปฏิบัติหน้าที่ของวันนี้ (มัดรวมรายชื่อ 501 รหัส 3, 4, 5, 6 เข้าด้วยกัน)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -497,7 +395,6 @@
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                // ปรับตัวแปรมารองรับตำแหน่ง วิทยุ/เสมียน, รักษาสถานที่ และรวมกลุ่ม 501 เข้าเป็น Array
                 let dutyPositions = { radioClerk: '-', guard: '-', pos501: [] };
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
@@ -712,4 +609,5 @@
         loadSheetsDataFromAppsScript();
     });
 </script>
-
+</body>
+</html>
