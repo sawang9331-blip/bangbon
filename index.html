@@ -29,7 +29,7 @@
         
         .live-review-box { margin-top: 8px; padding: 10px; background: #071408; border-left: 3px solid #00ff41; font-family: monospace; font-size: 0.85em; color: #00ff41; border-radius: 4px; }
         .staff-selector { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-top: 5px; max-height: 200px; overflow-y: auto; border: 1px solid #333; }
-        .staff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .staff-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 8px; }
         .staff-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; cursor: pointer; background: #262626; padding: 8px; border-radius: 6px; border: 1px solid #333; }
         .staff-item input { width: auto; margin-top: 0; transform: scale(1.2); }
         .group-title { font-size: 0.8em; color: #ffd740; margin: 12px 0 6px 0; border-bottom: 1px dashed #333; padding-bottom: 2px; font-weight: bold; }
@@ -140,8 +140,7 @@
             </div>
             
             <div>
-                <label>📢 ผู้รายงานเหตุ</label>
-                <div class="staff-selector"><div id="fire_sender_list">กำลังโหลดรายชื่อ...</div></div>
+                <label>📢 ผู้รายงานเหตุ</label> <div class="staff-selector"><div id="fire_sender_list">กำลังโหลดรายชื่อ...</div></div>
             </div>
             
             <button type="button" class="w-full bg-red-600 text-white p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('fire')">
@@ -213,8 +212,7 @@
             </div>
 
             <div>
-                <label>📢 ผู้รายงานเหตุ</label>
-                <div class="staff-selector"><div id="res_sender_list">กำลังโหลดรายชื่อ...</div></div>
+                <label>📢 ผู้รายงานเหตุ</label> <div class="staff-selector"><div id="res_sender_list">กำลังโหลดรายชื่อ...</div></div>
             </div>
 
             <button type="button" class="w-full bg-amber-500 text-black p-4 rounded-xl font-bold text-base mt-4 shadow-md active:scale-95 transition cursor-pointer" onclick="prepareReport('rescue')">
@@ -236,7 +234,6 @@
                 </span>
                 <span id="today-date-badge" class="text-xs bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">กำลังโหลด...</span>
             </div>
-            
             <div id="today-duty-details" class="grid grid-cols-2 gap-3 text-sm">
                 <div class="col-span-2 text-center py-4 text-zinc-500">
                     <i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดึงข้อมูลเวรวันนี้จากระบบ...
@@ -277,11 +274,16 @@
                 <i class="fa-solid fa-circle-info"></i> หมายเหตุสัญลักษณ์ปฏิบัติหน้าที่
             </h3>
             <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-blue-500 rounded mr-1.5"></span> 1 = พนักงานวิทยุ</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-purple-500 rounded mr-1.5"></span> 2 = เสมียนเวร</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-green-500 rounded mr-1.5"></span> 3 = รักษาสถานที่</div>
-                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-orange-500 rounded mr-1.5"></span> 4 = ตำแหน่ง 501</div>
-                <div class="flex items-center col-span-2 text-zinc-400 border-t border-zinc-800/60 pt-1.5 mt-0.5">
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-blue-500 rounded mr-1.5"></span> 1 = วิทยุ / เสมียน</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-purple-500 rounded mr-1.5"></span> 2 = รักษาสถานที่</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-green-500 rounded mr-1.5"></span> 3 = 501</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-orange-500 rounded mr-1.5"></span> 4 = 501</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-red-500 rounded mr-1.5"></span> 5 = 501</div>
+                <div class="flex items-center"><span class="w-2.5 h-2.5 bg-yellow-500 rounded mr-1.5"></span> 6 = 501</div>
+                <div class="flex items-center col-span-2 text-zinc-300 border-t border-zinc-800/60 pt-1.5 mt-0.5 font-bold">
+                    <span class="w-2.5 h-2.5 bg-rose-500 rounded mr-1.5"></span> 7 = ส่งเอกสารงานธุรการ
+                </div>
+                <div class="flex items-center col-span-2 text-zinc-400 pt-0.5">
                     พ = เวรพัก | ช = เวรเช้า (08:00 น.) | ต = เวรดึก (20:00 น.)
                 </div>
             </div>
@@ -354,18 +356,11 @@
         let currentMonthIdx = now.getMonth() + currentMonthOffset; 
         let currentYear = now.getFullYear();  
         
-        if (currentMonthIdx < 0) {
-            currentMonthIdx = 11;
-            currentYear--;
-        } else if (currentMonthIdx > 11) {
-            currentMonthIdx = 0;
-            currentYear++;
-        }
+        if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
+        else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const targetMonthName = thaiMonths[currentMonthIdx];
-        const targetYearThai = currentYear + 543;
-        const fullSheetName = targetMonthName + " " + targetYearThai;
+        const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
         
         if (labelEl) labelEl.innerText = fullSheetName;
 
@@ -411,6 +406,7 @@
                     if (cellValue === '4') bgStyle += ' background-color: rgba(249, 115, 22, 0.2); color: #fb923c; font-weight: bold;';  
                     if (cellValue === '5') bgStyle += ' background-color: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: bold;';  
                     if (cellValue === '6') bgStyle += ' background-color: rgba(234, 179, 8, 0.2); color: #facc15; font-weight: bold;';  
+                    if (cellValue === '7' || cellValue === 'ส') bgStyle += ' background-color: rgba(244, 63, 94, 0.25); color: #fb7185; font-weight: bold;'; 
                     if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
                 }
                 const textAlign = cellIndex === 0 ? 'text-left font-bold px-2 sticky left-0 bg-zinc-900 z-10' : 'text-center';
@@ -427,11 +423,11 @@
         const inputEl = document.getElementById(inputId);
         const outEl = document.getElementById(outputId);
         if (inputEl && outEl) {
-            const val = inputEl.value;
-            outEl.innerText = val ? "ตรวจสอบ: " + val : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
+            outEl.innerText = inputEl.value ? "ตรวจสอบ: " + inputEl.value : "ตัวอย่าง: (ยังไม่ได้ระบุข้อมูล)";
         }
     }
 
+    // แก้ไขฟังก์ชันการดึงข้อมูลเพื่อแยกบอร์ดเป็น 4 กล่อง (วิทยุ, รักษาสถานที่, ส่งเอกสาร 7, 501)
     async function fetchTodayDuty() {
         const detailsContainer = document.getElementById('today-duty-details');
         const badgeContainer = document.getElementById('today-date-badge');
@@ -446,7 +442,7 @@
             
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
-                let dutyPositions = { radioClerk: '-', guard: '-', pos501: [] };
+                let dutyPositions = { radioClerk: '-', guard: '-', docAdmin: '-', pos501: [] };
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
@@ -454,10 +450,11 @@
                     const staffName = row[0] ? row[0].toString().trim() : '';
                     if (!staffName || staffName.includes("ตารางเวร") || staffName.includes("รายชื่อ")) continue;
 
-                    const dutyType = row[today] ? parseInt(row[today]) : 0;
-                    if (dutyType === 1) dutyPositions.radioClerk = staffName;
-                    if (dutyType === 2) dutyPositions.guard = staffName;
-                    if (dutyType === 3 || dutyType === 4 || dutyType === 5 || dutyType === 6) {
+                    const dutyType = row[today] ? row[today].toString().trim() : '0';
+                    if (dutyType === '1') dutyPositions.radioClerk = staffName;
+                    if (dutyType === '2') dutyPositions.guard = staffName;
+                    if (dutyType === '7' || dutyType === 'ส') dutyPositions.docAdmin = staffName;
+                    if (dutyType === '3' || dutyType === '4' || dutyType === '5' || dutyType === '6') {
                         dutyPositions.pos501.push(staffName);
                     }
                 }
@@ -475,6 +472,10 @@
                         <div class="bg-zinc-800/60 p-2 rounded border border-purple-700/50">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-shield-halved mr-1 text-purple-400"></i> รักษาสถานที่ (2)</span>
                             <span class="text-zinc-200 font-bold text-base">${dutyPositions.guard}</span>
+                        </div>
+                        <div class="bg-zinc-800/60 p-2 rounded border border-rose-700/50 col-span-2">
+                            <span class="text-xs text-rose-400 block"><i class="fa-solid fa-file-signature mr-1"></i> ส่งเอกสารงานธุรการ (7)</span>
+                            <span class="text-zinc-200 font-bold text-base">${dutyPositions.docAdmin}</span>
                         </div>
                         <div class="bg-zinc-800/60 p-2 rounded border border-orange-700/50 col-span-2">
                             <span class="text-xs text-zinc-400 block"><i class="fa-solid fa-location-crosshairs mr-1 text-orange-400"></i> ตำแหน่ง 501 (3, 4, 5, 6)</span>
@@ -505,12 +506,6 @@
         document.getElementById('res_sender_list').innerHTML = htmlSend;
     }
 
-    function getThaiDate() {
-        const d = new Date();
-        const m = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        return `วันที่ ${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear() + 543}`;
-    }
-
     function toggleOther() {
         const s = document.getElementById('res_type_text');
         const otherInput = document.getElementById('res_type_other');
@@ -531,13 +526,7 @@
             const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
             const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('f_t1').value || '-',
-                2: document.getElementById('f_t2').value || '-',
-                3: document.getElementById('f_t3').value || '-',
-                4: document.getElementById('f_t4').value || '-',
-                5: document.getElementById('f_t5').value || '-'
-            };
+            const t = { 1: document.getElementById('f_t1').value || '-', 2: document.getElementById('f_t2').value || '-', 3: document.getElementById('f_t3').value || '-', 4: document.getElementById('f_t4').value || '-', 5: document.getElementById('f_t5').value || '-' };
             text = `${dateStr}\nส.ดพ.บางบอน\n🔥 รายงานเหตุเพลิงไหม้\n------------------\n📍 สถานที่: ${place}\n⏰ รับแจ้ง: ${t[1]} น\n⏰ แจ้งออก: ${t[2]} น\n⏰ ว.10: ${t[3]} น\n⏰ เลิก ว.10: ${t[4]} น\n⏰ ว.10 ส.ดพ.: ${t[5]} น\n🚒 รถที่ออก: ${cars}\n👥 ผู้ปฏิบัติงาน: ${team}\n📢 ผู้รายงาน: ${sender}`;
             json = { type: "เพลิงไหม้", date: dateStr, place: place, len: "-", staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: cars };
         } else {
@@ -548,13 +537,7 @@
             const car = document.getElementById('res_car_single').value || '-';
             const team = Array.from(document.querySelectorAll('#res_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#res_sender_list input:checked') || {value: '-'}).value;
-            const t = {
-                1: document.getElementById('r_t1').value || '-',
-                2: document.getElementById('r_t2').value || '-',
-                3: document.getElementById('r_t3').value || '-',
-                4: document.getElementById('r_t4').value || '-',
-                5: document.getElementById('r_t5').value || '-'
-            };
+            const t = { 1: document.getElementById('r_t1').value || '-', 2: document.getElementById('r_t2').value || '-', 3: document.getElementById('r_t3').value || '-', 4: document.getElementById('r_t4').value || '-', 5: document.getElementById('r_t5').value || '-' };
             text = `${dateStr}\nส.ดพ.บางบอน\n🐾 ช่วยเหลือประชาชน (${animal})\n------------------\n📏 ขนาด: ${size}\n📍 สถานที่: ${place}\n⏰ รับแจ้ง: ${t[1]} น\n⏰ แจ้งออก: ${t[2]} น\n⏰ ว.10: ${t[3]} น\n⏰ เลิก ว.10: ${t[4]} น\n⏰ ว.10 ส.ดพ.: ${t[5]} น\n🚒 รถที่ออก: ${car}\n👥 ผู้ปฏิบัติงาน: ${team}\n📢 ผู้รายงาน: ${sender}`;
             json = { type: `501 (${animal})`, date: dateStr, place: place, len: size, staff: team, sender: sender, t1: t[1], t2: t[2], t3: t[3], t4: t[4], t5: t[5], car: car };
         }
@@ -570,12 +553,10 @@
         if (!pendingData) return;
         const btn = document.getElementById('btnConfirmSend');
         btn.disabled = true; btn.innerText = "กำลังบันทึก...";
-        const text = pendingData.text;
-        const json = pendingData.json;
+        const text = pendingData.text; const json = pendingData.json;
 
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch (e) {
+        try { await navigator.clipboard.writeText(text); } 
+        catch (e) {
             const el = document.createElement('textarea'); el.value = text;
             document.body.appendChild(el); el.select(); document.execCommand('copy');
             document.body.removeChild(el);
@@ -615,7 +596,6 @@
     window.addEventListener("load", () => {
         generateStaff();
         switchTab('home'); 
-        document.getElementById('current-date').innerText = getThaiDate();
         loadSheetsDataFromAppsScript();
     });
 </script>
