@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.3.7</title>
+    <title>ส.ดพ.บางบอน V3.3.6</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V3.3.7</p>
+            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V3.3.6</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -357,7 +357,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzd-9pfr5RsY3CuxHXo-wECIOb5nHjICjhb8ZrK2DMYz0SoTwJ9iaYh7nlg4LA2VBQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTrupxObncmjt4Y6zE81Hw_pWFKCR2oKB_PwzAEWHcpGNdnLG2QPd5k-fM62tKoWY/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
@@ -405,7 +405,7 @@
         if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
         else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
         
-        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กุมภาพันธ์", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
         
         if (labelEl) labelEl.innerText = fullSheetName;
@@ -541,7 +541,8 @@
         for (let g = 1; g <= 4; g++) {
             htmlTeam += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
             htmlSend += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
-            for (let i = 1; i <= 10; i++) {
+            // แก้ไขลูปตรงนี้ให้วิ่งถึงเลข 11 เพื่อดึงข้อมูลรายชื่อเจ้าหน้าที่ครบตามต้องการ
+            for (let i = 1; i <= 11; i++) {
                 const name = `บางบอน ${g}-${i}`;
                 htmlTeam += `<label class="staff-item"><input type="checkbox" class="st-chk" value="${name}"> ${name}</label>`;
                 htmlSend += `<label class="staff-item"><input type="radio" name="sender_radio" value="${name}"> ${name}</label>`;
@@ -652,7 +653,6 @@
         switchTab('home'); 
         loadSheetsDataFromAppsScript();
         
-        // อัปเดตแสดงผลวันที่ปัจจุบันตรง Header ของแอป
         const headerDate = document.getElementById('current-date');
         if (headerDate) headerDate.innerText = getThaiDate();
     });
