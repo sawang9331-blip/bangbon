@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V3.3.6</title>
+    <title>ส.ดพ.บางบอน V3.3.7</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V3.3.6</p>
+            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V3.3.7</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -114,55 +114,52 @@
                 <div id="lp_fire_place" class="live-review-box">ตัวอย่าง: (ยังไม่ได้ระบุสถานที่)</div>
             </div>
             
-         <div>
-    <label>🚒 รถที่ออกเหตุ (เลือกตามลำดับ)</label>
-    <div class="grid grid-cols-3 gap-2 mt-1">
-        <!-- คันที่ 1 -->
-        <select id="fire_car1">
-            <option value="">-- รถ 1 --</option>
-            <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
-            <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
-            <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
-            <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
-            <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
-            <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
-            <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
-            <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
-            <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
-            <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
-        </select>
+            <div>
+                <label>🚒 รถที่ออกเหตุ (เลือกตามลำดับ)</label>
+                <div class="grid grid-cols-3 gap-2 mt-1">
+                    <select id="fire_car1">
+                        <option value="">-- รถ 1 --</option>
+                        <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
+                        <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
+                        <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
+                        <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
+                        <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
+                        <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
+                        <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
+                        <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
+                        <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
+                        <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
+                    </select>
 
-        <!-- คันที่ 2 -->
-        <select id="fire_car2">
-            <option value="">-- รถ 2 --</option>
-            <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
-            <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
-            <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
-            <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
-            <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
-            <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
-            <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
-            <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
-            <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
-            <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
-        </select>
+                    <select id="fire_car2">
+                        <option value="">-- รถ 2 --</option>
+                        <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
+                        <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
+                        <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
+                        <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
+                        <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
+                        <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
+                        <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
+                        <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
+                        <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
+                        <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
+                    </select>
 
-        <!-- คันที่ 3 -->
-        <select id="fire_car3">
-            <option value="">-- รถ 3 --</option>
-            <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
-            <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
-            <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
-            <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
-            <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
-            <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
-            <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
-            <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
-            <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
-            <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
-        </select>
-    </div>
-</div>
+                    <select id="fire_car3">
+                        <option value="">-- รถ 3 --</option>
+                        <option value="รถยนต์ หรือ จยย-ส่วนตัว">รถยนต์ หรือ จยย-ส่วนตัว</option>
+                        <option value="รถ จยย ดับเพลิง">รถ จยย ดับเพลิง</option>
+                        <option value="รถบางบอน 061-1">รถบางบอน 061-1</option>
+                        <option value="รถบางบอน 061-2">รถบางบอน 061-2</option>
+                        <option value="รถบางบอน 041-1">รถบางบอน 041-1</option>
+                        <option value="รถบางบอน 046-1">รถบางบอน 046-1</option>
+                        <option value="รถบางบอน 051-1">รถบางบอน 051-1</option>
+                        <option value="รถบางบอน 052-1">รถบางบอน 052-1</option>
+                        <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
+                        <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
+                    </select>
+                </div>
+            </div>
 
             <div>
                 <label>⏰ บันทึกเวลาปฏิบัติการ</label>
@@ -368,7 +365,6 @@
     let currentMonthOffset = 0;
     let pendingData = null;
 
-    // ฟังก์ชันสร้างวันที่สำหรับหน้าสรุปรายงาน (แก้อาการปุ่มกดไม่ติด)
     function getThaiDate() {
         const d = new Date();
         const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -446,12 +442,10 @@
 
                 let bgStyle = '';
                 if (isHeader) {
-                    // ขยาย min-w และ w ของคอลัมน์แรกเพื่อให้หัวตารางรับกับชื่อ และสั่งห้ามตัดคำด้วย white-space: nowrap
                     const widthStyle = cellIndex === 0 ? 'min-w-[140px] w-[140px] white-space: nowrap;' : 'min-w-[35px] w-[35px]';
                     bgStyle = `border: 1px solid #3f3f46; padding: 6px 2px; ${widthStyle};`;
                 } else {
                     bgStyle = 'border: 1px solid #27272a; padding: 6px 2px;';
-                    // เพิ่ม white-space: nowrap และกำหนดขนาดให้แถวรายชื่อเจ้าหน้าที่ทั่วไป ไม่ให้ตัวหนังสือหดตัว
                     if (cellIndex === 0) {
                         bgStyle += ' white-space: nowrap; min-w-[140px] w-[140px];';
                     }
@@ -609,8 +603,13 @@
         btn.disabled = true; btn.innerText = "กำลังบันทึก...";
         const text = pendingData.text; const json = pendingData.json;
 
-        try { await navigator.clipboard.writeText(text); } 
-        catch (e) {
+        try { 
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(text); 
+            } else {
+                throw new Error("Clipboard API not available");
+            }
+        } catch (e) {
             const el = document.createElement('textarea'); el.value = text;
             document.body.appendChild(el); el.select(); document.execCommand('copy');
             document.body.removeChild(el);
@@ -622,15 +621,16 @@
                 headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
                 body: JSON.stringify(json)
             });
+        } catch (err) {
+            console.error("Supabase Error:", err);
+        } finally {
             const hint = document.getElementById('copyHint');
             if(hint) hint.classList.remove('hidden');
             setTimeout(() => { if(hint) hint.classList.add('hidden'); }, 3000);
-            closePreview(); switchTab('home');
-        } catch (err) {
-            console.error(err);
-            closePreview(); switchTab('home');
-        } finally {
-            btn.disabled = false; btn.innerText = "ยืนยันการคัดลอก";
+            closePreview(); 
+            switchTab('home');
+            btn.disabled = false; 
+            btn.innerText = "ยืนยันการคัดลอก";
         }
     }
 
@@ -651,5 +651,11 @@
         generateStaff();
         switchTab('home'); 
         loadSheetsDataFromAppsScript();
+        
+        // อัปเดตแสดงผลวันที่ปัจจุบันตรง Header ของแอป
+        const headerDate = document.getElementById('current-date');
+        if (headerDate) headerDate.innerText = getThaiDate();
     });
 </script>
+</body>
+</html>
