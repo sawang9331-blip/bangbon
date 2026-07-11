@@ -392,37 +392,39 @@
     }
 
     function renderMonthlySchedule() {
-        const labelEl = document.getElementById('current-view-month-label');
-        const containerEl = document.getElementById('sheet-data-container');
-        
-        if (currentMonthOffset < -1) currentMonthOffset = -1;
-        if (currentMonthOffset > 1) currentMonthOffset = 1;
+    const labelEl = document.getElementById('current-view-month-label');
+    const containerEl = document.getElementById('sheet-data-container');
+    
+    if (currentMonthOffset < -1) currentMonthOffset = -1;
+    if (currentMonthOffset > 1) currentMonthOffset = 1;
 
-        const now = new Date();
-        let currentMonthIdx = now.getMonth() + currentMonthOffset; 
-        let currentYear = now.getFullYear();  
-        
-        if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
-        else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
-        
-        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กุมภาพันธ์", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
-        
-        if (labelEl) labelEl.innerText = fullSheetName;
+    const now = new Date();
+    let currentMonthIdx = now.getMonth() + currentMonthOffset; 
+    let currentYear = now.getFullYear();  
+    
+    if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
+    else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
+    
+    // เรียงชื่อเดือนให้ตรงกับหน้าแท็บของ Google Sheets
+    const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
+    
+    if (labelEl) labelEl.innerText = fullSheetName;
 
-        if (containerEl) {
-            if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
-                return;
-            }
-            let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
-            if (targetKey && globalAllSheetsData[targetKey]) {
-                displaySheetTable(globalAllSheetsData[targetKey]);
-            } else {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
-            }
+    if (containerEl) {
+        if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
+            containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
+            return;
+        }
+        // ล้างช่องว่างออกให้หมดตอนเทียบชื่อแท็บ เพื่อป้องกันการพิมพ์เว้นวรรคไม่เท่ากันใน Google Sheets
+        let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
+        if (targetKey && globalAllSheetsData[targetKey]) {
+            displaySheetTable(globalAllSheetsData[targetKey]);
+        } else {
+            containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
         }
     }
+}
 
     function displaySheetTable(matrix) {
         const container = document.getElementById('sheet-data-container');
