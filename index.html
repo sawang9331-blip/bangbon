@@ -597,9 +597,9 @@
         if (!leaveDisplay) return;
 
         if (todayLeavesFromSheet.length > 0) {
-            let htmlList = '<ul class="space-y-1">';
+            let htmlList = '<ul class="space-y-1.5">';
             todayLeavesFromSheet.forEach(l => {
-                htmlList += `<li class="flex items-center justify-between text-rose-300 font-medium"><span><i class="fa-solid fa-user-clock mr-1.5 text-amber-400"></i> ${l.name}</span> <span class="bg-rose-950 border border-rose-800 text-rose-300 px-2 py-0.5 rounded text-[10px]">${l.type}</span></li>`;
+                htmlList += `<li class="flex items-center justify-between text-rose-300 font-medium"><span><i class="fa-solid fa-user-clock mr-1.5 text-amber-400"></i> <strong class="text-base text-white">${l.name}</strong></span> <span class="bg-rose-950 border border-rose-800 text-rose-300 px-2.5 py-0.5 rounded text-xs">${l.type}</span></li>`;
             });
             htmlList += '</ul>';
             leaveDisplay.innerHTML = htmlList;
