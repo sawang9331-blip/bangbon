@@ -88,7 +88,7 @@
                 <div class="w-12 h-12 rounded-lg bg-teal-600/20 flex items-center justify-center text-teal-400 text-xl"><i class="fa-solid fa-calendar-days"></i></div>
                 <div>
                     <h3 class="font-bold text-white text-base">ตารางเวรปฏิบัติหน้าที่</h3>
-                    <p class="text-xs text-zinc-400 mt-0.5">ตรวจสอบตารางเวรรายวันแบบกระจายตำแหน่ง 501 และแจ้งวันลา</p>
+                    <p class="text-xs text-zinc-400 mt-0.5">ตรวจสอบตารางเวรรายวันแบบกระจายตำแหน่ง 501</p>
                 </div>
             </button>
 
@@ -266,7 +266,7 @@
         </div>
     </div>
 
-    <!-- TAB SCHEDULE & LEAVE MANAGEMENT -->
+    <!-- TAB SCHEDULE -->
     <div id="tab-schedule" class="tab-content">
         <div class="flex items-center gap-2 mb-3 border-b border-zinc-800 pb-2">
             <i class="fa-solid fa-calendar-days text-teal-400 text-xl"></i>
@@ -296,42 +296,6 @@
                 <div id="today-leave-display" class="text-xs text-zinc-300 bg-zinc-950 p-2.5 rounded-lg border border-rose-900/30">
                     <span class="text-zinc-500">ตรวจสอบข้อมูลการลา...</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- 2. ฟังก์ชันการลงวันลาตามชื่อ -->
-        <div class="bg-zinc-900 border border-zinc-700 rounded-xl p-4 mb-4 shadow-md">
-            <h3 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-1">
-                <i class="fa-solid fa-pen-to-square"></i> ระบบแจ้งลางาน / จองวันลาตามชื่อ
-            </h3>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs text-zinc-400">เลือกชื่อเจ้าหน้าที่</label>
-                    <select id="leave-staff-name" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded-lg text-sm text-white">
-                        <option value="">-- เลือกรายชื่อเจ้าหน้าที่ --</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs text-zinc-400">ประเภทการลา</label>
-                    <select id="leave-type" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded-lg text-sm text-white">
-                        <option value="ลากิจ">ลากิจ</option>
-                        <option value="ลาป่วย">ลาป่วย</option>
-                        <option value="ลาพักผ่อน">ลาพักผ่อน</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-zinc-400">ตั้งแต่วันที่</label>
-                        <input type="date" id="leave-start-date" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded-lg text-sm text-white">
-                    </div>
-                    <div>
-                        <label class="text-xs text-zinc-400">ถึงวันที่</label>
-                        <input type="date" id="leave-end-date" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded-lg text-sm text-white">
-                    </div>
-                </div>
-                <button type="button" onclick="submitLeaveRequest()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-2.5 rounded-lg text-sm transition cursor-pointer mt-1">
-                    <i class="fa-solid fa-floppy-disk mr-1"></i> บันทึกข้อมูลการลา
-                </button>
             </div>
         </div>
 
@@ -415,7 +379,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvRL3azPsWLDCOABC2nP_bbH1bPrZsnV0KT0ZxrwYjK1KNAs5IEdY0vsk80cI2SKLs/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTrupxObncmjt4Y6zE81Hw_pWFKCR2oKB_PwzAEWHcpGNdnLG2QPd5k-fM62tKoWY/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
@@ -592,76 +556,34 @@
                 }
                 if (badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
 
-                loadAndRenderLeaves(today, currentMonth, d.getFullYear());
+                loadAndRenderLeaves(today);
             }
         } catch (error) { console.error(error); }
     }
 
     function generateStaff() {
-        let htmlTeam = '', htmlSend = '', leaveSelectOptions = '<option value="">-- เลือกรายชื่อเจ้าหน้าที่ --</option>';
+        let htmlTeam = '', htmlSend = '';
         
         for (let g = 1; g <= 4; g++) {
             htmlTeam += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
             htmlSend += `<div class="group-title">กลุ่มบางบอน ${g}-X</div><div class="staff-grid">`;
-            leaveSelectOptions += `<optgroup label="กลุ่มบางบอน ${g}-X">`;
             
             for (let i = 1; i <= 11; i++) {
                 const name = `บางบอน ${g}-${i}`;
                 htmlTeam += `<label class="staff-item"><input type="checkbox" class="st-chk" value="${name}"> ${name}</label>`;
                 htmlSend += `<label class="staff-item"><input type="radio" name="sender_radio" value="${name}"> ${name}</label>`;
-                leaveSelectOptions += `<option value="${name}">${name}</option>`;
             }
             htmlTeam += '</div></div>'; 
             htmlSend += '</div></div>';
-            leaveSelectOptions += `</optgroup>`;
         }
         
         document.getElementById('fire_team_list').innerHTML = htmlTeam;
         document.getElementById('res_team_list').innerHTML = htmlTeam;
         document.getElementById('fire_sender_list').innerHTML = htmlSend;
         document.getElementById('res_sender_list').innerHTML = htmlSend;
-        
-        const leaveSelect = document.getElementById('leave-staff-name');
-        if (leaveSelect) leaveSelect.innerHTML = leaveSelectOptions;
     }
 
-    function submitLeaveRequest() {
-        const staffName = document.getElementById('leave-staff-name').value;
-        const leaveType = document.getElementById('leave-type').value;
-        const startDate = document.getElementById('leave-start-date').value;
-        const endDate = document.getElementById('leave-end-date').value;
-
-        if (!staffName) {
-            alert("กรุณาเลือกชื่อเจ้าหน้าที่ผู้ลา");
-            return;
-        }
-        if (!startDate || !endDate) {
-            alert("กรุณาระบุวันที่เริ่มต้นและวันสิ้นสุดการลา");
-            return;
-        }
-
-        let leaveRecords = JSON.parse(localStorage.getItem('bb_leave_records') || '[]');
-        leaveRecords.push({
-            name: staffName,
-            type: leaveType,
-            start: startDate,
-            end: endDate,
-            timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem('bb_leave_records', JSON.stringify(leaveRecords));
-        alert(`บันทึกการลาของ ${staffName} (${leaveType}) เรียบร้อยแล้ว!`);
-        
-        document.getElementById('leave-staff-name').value = "";
-        document.getElementById('leave-start-date').value = "";
-        document.getElementById('leave-end-date').value = "";
-
-        const d = new Date();
-        const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        loadAndRenderLeaves(d.getDate(), thaiMonths[d.getMonth()], d.getFullYear());
-    }
-
-    function loadAndRenderLeaves(todayNum, currentMonthName, currentYearNum) {
+    function loadAndRenderLeaves(todayNum) {
         const leaveDisplay = document.getElementById('today-leave-display');
         if (!leaveDisplay) return;
 
