@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V4.0.0</title>
+    <title>ส.ดพ.บางบอน V4.0.1</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.0.0</p>
+            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.0.1</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -343,7 +343,7 @@
                     <span class="w-2.5 h-2.5 bg-rose-500 rounded mr-1.5"></span> 7 = ส่งเอกสารงานธุรการ
                 </div>
                 <div class="flex items-center col-span-2 text-zinc-400 pt-0.5">
-                    พ = เวรพัก | ช = เวรเช้า (08:00 น.) | ต = เวรดึก (20:00 น.)
+                    21 = ลาพักผ่อน | 22 = ลากิจ | 23 = ลาป่วย
                 </div>
             </div>
         </div>
@@ -478,6 +478,7 @@
                     if (cellValue === '5') bgStyle += ' background-color: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: bold;';  
                     if (cellValue === '6') bgStyle += ' background-color: rgba(234, 179, 8, 0.2); color: #facc15; font-weight: bold;';  
                     if (cellValue === '7' || cellValue === 'ส') bgStyle += ' background-color: rgba(244, 63, 94, 0.25); color: #fb7185; font-weight: bold;'; 
+                    if (cellValue === '21' || cellValue === '22' || cellValue === '23') bgStyle += ' background-color: rgba(225, 29, 72, 0.3); color: #fda4af; font-weight: bold;'; 
                     if (cellValue === 'พ') bgStyle += ' color: #71717a;'; 
                 }
                 const textAlign = cellIndex === 0 ? 'text-left font-bold px-2 sticky left-0 bg-zinc-900 z-10' : 'text-center';
@@ -514,6 +515,7 @@
             if (targetSheetName && globalAllSheetsData[targetSheetName]) {
                 const sheetMatrix = globalAllSheetsData[targetSheetName];
                 let dutyPositions = { radioClerk: '-', guard: '-', docAdmin: '-', pos501: [] };
+                let todayLeavesFromSheet = [];
 
                 for (let i = 0; i < sheetMatrix.length; i++) {
                     const row = sheetMatrix[i];
@@ -527,6 +529,13 @@
                     if (dutyType === '7' || dutyType === 'ส') dutyPositions.docAdmin = staffName;
                     if (dutyType === '3' || dutyType === '4' || dutyType === '5' || dutyType === '6') {
                         dutyPositions.pos501.push(staffName);
+                    }
+                    if (dutyType === '21') {
+                        todayLeavesFromSheet.push({ name: staffName, type: 'ลาพักผ่อน' });
+                    } else if (dutyType === '22') {
+                        todayLeavesFromSheet.push({ name: staffName, type: 'ลากิจ' });
+                    } else if (dutyType === '23') {
+                        todayLeavesFromSheet.push({ name: staffName, type: 'ลาป่วย' });
                     }
                 }
 
@@ -556,7 +565,7 @@
                 }
                 if (badgeContainer) badgeContainer.innerText = `วันที่ ${today} ${currentMonth}`;
 
-                loadAndRenderLeaves(today);
+                renderLeavesDisplay(todayLeavesFromSheet);
             }
         } catch (error) { console.error(error); }
     }
@@ -583,21 +592,13 @@
         document.getElementById('res_sender_list').innerHTML = htmlSend;
     }
 
-    function loadAndRenderLeaves(todayNum) {
+    function renderLeavesDisplay(todayLeavesFromSheet) {
         const leaveDisplay = document.getElementById('today-leave-display');
         if (!leaveDisplay) return;
 
-        let leaveRecords = JSON.parse(localStorage.getItem('bb_leave_records') || '[]');
-        const now = new Date();
-        const todayStr = now.toISOString().split('T')[0];
-
-        let todayLeaves = leaveRecords.filter(item => {
-            return todayStr >= item.start && todayStr <= item.end;
-        });
-
-        if (todayLeaves.length > 0) {
+        if (todayLeavesFromSheet.length > 0) {
             let htmlList = '<ul class="space-y-1">';
-            todayLeaves.forEach(l => {
+            todayLeavesFromSheet.forEach(l => {
                 htmlList += `<li class="flex items-center justify-between text-rose-300 font-medium"><span><i class="fa-solid fa-user-clock mr-1.5 text-amber-400"></i> ${l.name}</span> <span class="bg-rose-950 border border-rose-800 text-rose-300 px-2 py-0.5 rounded text-[10px]">${l.type}</span></li>`;
             });
             htmlList += '</ul>';
