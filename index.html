@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V4.0.1</title>
+    <title>ส.ดพ.บางบอน V4.0.2</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.0.1</p>
+            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.0.2</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -147,7 +147,6 @@
                         <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
                         <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
                         <option value="รถบางบอน 031-1">รถบางบอน 031-1</option>
-
                     </select>
 
                     <select id="fire_car3">
@@ -163,7 +162,6 @@
                         <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
                         <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
                         <option value="รถบางบอน 031-1">รถบางบอน 031-1</option>
-
                     </select>
 
                     <select id="fire_car4">
@@ -179,7 +177,6 @@
                         <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
                         <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
                         <option value="รถบางบอน 031-1">รถบางบอน 031-1</option>
-
                     </select>
                     
                     <select id="fire_car5">
@@ -195,7 +192,6 @@
                         <option value="รถบางบอน 052-2">รถบางบอน 052-2</option>
                         <option value="รถบางบอน 053-1">รถบางบอน 053-1</option>
                         <option value="รถบางบอน 031-1">รถบางบอน 031-1</option>
-
                     </select>
                 </div>
             </div>
@@ -662,7 +658,13 @@
 
         if (type === 'fire') {
             const place = document.getElementById('fire_place').value || '-';
-            const cars = [document.getElementById('fire_car1').value, document.getElementById('fire_car2').value, document.getElementById('fire_car3').value].filter(v => v).join(', ') || '-';
+            const cars = [
+                document.getElementById('fire_car1').value, 
+                document.getElementById('fire_car2').value, 
+                document.getElementById('fire_car3').value,
+                document.getElementById('fire_car4').value,
+                document.getElementById('fire_car5').value
+            ].filter(v => v).join(', ') || '-';
             const team = Array.from(document.querySelectorAll('#fire_team_list input:checked')).map(e => e.value).join(', ') || '-';
             const sender = (document.querySelector('#fire_sender_list input:checked') || {value: '-'}).value;
             const t = { 1: document.getElementById('f_t1').value || '-', 2: document.getElementById('f_t2').value || '-', 3: document.getElementById('f_t3').value || '-', 4: document.getElementById('f_t4').value || '-', 5: document.getElementById('f_t5').value || '-' };
