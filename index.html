@@ -424,7 +424,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrryIcXq8qH82-ZxmmleprdhZp1jurIx-YlqW22IcAeyzocA6l4wd-lOE79gNR3nnj/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4cNlpodU4zmCuLPXhXR1gWdnGtsHdGviPzXMSrt0JN5-C-dKM0wfrc_2uWQER9EBA/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
@@ -455,13 +455,13 @@
         const nextOffset = currentMonthOffset + offsetDirection;
         if (nextOffset >= -1 && nextOffset <= 1) {
             currentMonthOffset = nextOffset;
-            renderMonthlySchedule();
+            loadSheetsDataFromAppsScript(); // โหลดข้อมูลแบบเฉพาะเจาะจงเพื่อความเร็ว
         }
     }
 
     function changeTeam(teamValue) {
         currentTeam = teamValue;
-        renderMonthlySchedule();
+        loadSheetsDataFromAppsScript(); // โหลดข้อมูลเฉพาะชุดที่เลือก
     }
 
     function renderMonthlySchedule() {
@@ -761,15 +761,31 @@
 
     async function loadSheetsDataFromAppsScript() {
         try {
-            const response = await fetch(APPS_SCRIPT_URL + "?action=getData");
+            const now = new Date();
+            let currentMonthIdx = now.getMonth() + currentMonthOffset; 
+            let currentYear = now.getFullYear();  
+            if (currentMonthIdx < 0) { currentMonthIdx = 11; currentYear--; }
+            else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
+            
+            const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const monthName = thaiMonths[currentMonthIdx];
+            const fullYearNum = currentYear + 543;
+            const monthQuery = `${monthName} ${fullYearNum}`;
+
+            const url = `${APPS_SCRIPT_URL}?action=getData&month=${encodeURIComponent(monthQuery)}&team=${currentTeam}`;
+            
+            const response = await fetch(url);
             if (!response.ok) throw new Error("Network error");
             const data = await response.json();
+            
             if (data) {
                 globalAllSheetsData = data;
                 fetchTodayDuty();
                 renderMonthlySchedule(); 
             }
-        } catch (error) { console.error(error); }
+        } catch (error) { 
+            console.error("Load Error:", error); 
+        }
     }
 
     window.addEventListener("load", () => {
