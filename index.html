@@ -424,7 +424,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw4cNlpodU4zmCuLPXhXR1gWdnGtsHdGviPzXMSrt0JN5-C-dKM0wfrc_2uWQER9EBA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw25BD1PdwF_dTXTJSBpzHA222YjSgBI27esz9_2Kjw_WgY7xVe4NtBzHuvYQ24R7ZG/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
@@ -455,13 +455,13 @@
         const nextOffset = currentMonthOffset + offsetDirection;
         if (nextOffset >= -1 && nextOffset <= 1) {
             currentMonthOffset = nextOffset;
-            loadSheetsDataFromAppsScript(); // โหลดข้อมูลแบบเฉพาะเจาะจงเพื่อความเร็ว
+            loadSheetsDataFromAppsScript(); 
         }
     }
 
     function changeTeam(teamValue) {
         currentTeam = teamValue;
-        loadSheetsDataFromAppsScript(); // โหลดข้อมูลเฉพาะชุดที่เลือก
+        renderMonthlySchedule(); // ตัดแบ่งตารางตามชุดที่เลือกใหม่ทันทีโดยไม่ต้องโหลดใหม่
     }
 
     function renderMonthlySchedule() {
@@ -492,21 +492,51 @@
                 return;
             }
 
-            // ค้นหาชีตที่ตรงกับเดือน ปี และชุดปฏิบัติการ (เช่น "พฤศจิกายน 2569 ชุด 4")
+            // ค้นหาชีตที่ตรงกับเดือนและปี
             let targetKey = Object.keys(globalAllSheetsData).find(name => {
                 let n = name.replace(/\s+/g, '');
-                return n.includes(monthName) && n.includes(fullYearNum.toString()) && (n.includes(`ชุด${currentTeam}`) || n.includes(`ชุดที่${currentTeam}`));
+                return n.includes(monthName) && n.includes(fullYearNum.toString());
             });
 
-            // กรณีสำรอง หากยังไม่ได้ตั้งชื่อแท็บแยกชุด ให้ดึงแท็บตามเดือนก่อน
             if (!targetKey) {
                 targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '').includes(monthName));
             }
 
             if (targetKey && globalAllSheetsData[targetKey]) {
-                displaySheetTable(globalAllSheetsData[targetKey]);
+                const fullMatrix = globalAllSheetsData[targetKey];
+                
+                // ค้นหาแถวที่เป็นจุดอ้างอิงของ "ชุดปฏิบัติการที่ X"
+                let teamStartIndex = -1;
+                let teamEndIndex = fullMatrix.length;
+
+                for (let i = 0; i < fullMatrix.length; i++) {
+                    const rowStr = fullMatrix[i].join(" ");
+                    if (rowStr.includes(`ชุดปฏิบัติการที่ ${currentTeam}`)) {
+                        teamStartIndex = i;
+                        break;
+                    }
+                }
+
+                if (teamStartIndex !== -1) {
+                    // ค้นหาจุดสิ้นสุดตารางของชุดนั้นๆ
+                    for (let j = teamStartIndex + 1; j < fullMatrix.length; j++) {
+                        const rowStr = fullMatrix[j].join(" ");
+                        if (rowStr.includes("ชุดปฏิบัติการที่")) {
+                            teamEndIndex = j;
+                            break;
+                        }
+                    }
+
+                    // ตัดเอาเฉพาะตารางของชุดที่เลือกมาแสดงผล
+                    const slicedMatrix = fullMatrix.slice(teamStartIndex, teamEndIndex);
+                    displaySheetTable(slicedMatrix);
+                } else {
+                    // กรณีไม่เจอข้อความอ้างอิง ให้แสดงทั้งหมดในชีต
+                    displaySheetTable(fullMatrix);
+                }
+
             } else {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวร ชุดที่ ${currentTeam} ประจำเดือน ${monthName} ${fullYearNum}</div>`;
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรประจำเดือน ${monthName} ${fullYearNum}</div>`;
             }
         }
     }
@@ -517,7 +547,7 @@
 
         let html = '<div class="overflow-x-auto"><table class="table-layout-fixed min-w-full border-collapse text-center" style="font-size: 11px; color: #e4e4e7;">';
         matrix.forEach((row, rowIndex) => {
-            const isHeader = rowIndex < 4;
+            const isHeader = rowIndex < 3; // ปรับให้หัวตารางของชุดที่เลือกแสดงผลถูกต้อง
             html += `<tr class="${isHeader ? 'bg-zinc-800 text-amber-400 font-bold sticky top-0' : 'hover:bg-zinc-800/40 border-b border-zinc-800/60'}">`;
             
             row.forEach((cell, cellIndex) => {
@@ -772,7 +802,7 @@
             const fullYearNum = currentYear + 543;
             const monthQuery = `${monthName} ${fullYearNum}`;
 
-            const url = `${APPS_SCRIPT_URL}?action=getData&month=${encodeURIComponent(monthQuery)}&team=${currentTeam}`;
+            const url = `${APPS_SCRIPT_URL}?action=getData&month=${encodeURIComponent(monthQuery)}`;
             
             const response = await fetch(url);
             if (!response.ok) throw new Error("Network error");
