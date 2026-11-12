@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ส.ดพ.บางบอน V4.0.2</title>
+    <title>ส.ดพ.บางบอน V4.1.0</title>
     <link rel="stylesheet" href="background.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span class="text-2xl">🚒</span>
         <div>
             <h1 class="font-bold text-base leading-tight">ส.ดพ.บางบอน (สปภ. กทม.)</h1>
-            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.0.2</p>
+            <p class="text-xs text-amber-400">ระบบบันทึกรายงาน V4.1.0</p>
         </div>
     </div>
     <div id="current-date" class="text-xs bg-black/20 px-2 py-1 rounded">วันที่กำลังโหลด...</div>
@@ -332,21 +332,33 @@
             </div>
         </div>
 
-        <!-- ส่วนเลือกเดือนดูตารางเวร -->
+        <!-- ส่วนเลือกชุดปฏิบัติการ และเลือกเดือนดูตารางเวร -->
         <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 mb-4 shadow-md">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
-                <span class="text-sm font-bold text-amber-400 flex items-center gap-1">
-                    <i class="fa-solid fa-calendar-days"></i> เลือกดูตารางเวรประจำเดือน
-                </span>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
+                
+                <!-- Dropdown เลือกชุดปฏิบัติการ (1-4) -->
+                <div class="w-full sm:w-auto flex items-center gap-2">
+                    <span class="text-sm font-bold text-teal-400 flex items-center gap-1">
+                        <i class="fa-solid fa-users"></i> ชุด:
+                    </span>
+                    <select id="current-team-select" onchange="changeTeam(this.value)" class="bg-zinc-950 text-white text-xs px-3 py-2 rounded-lg border border-zinc-700">
+                        <option value="1">ชุดปฏิบัติการที่ 1</option>
+                        <option value="2" selected>ชุดปฏิบัติการที่ 2</option>
+                        <option value="3">ชุดปฏิบัติการที่ 3</option>
+                        <option value="4">ชุดปฏิบัติการที่ 4</option>
+                    </select>
+                </div>
+
+                <!-- ส่วนเปลี่ยนเดือน -->
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                     <button type="button" onclick="changeMonth(-1)" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
-                        <i class="fa-solid fa-chevron-left"></i> เดือนก่อนหน้า
+                        <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
                     </button>
-                    <span id="current-view-month-label" class="bg-zinc-950 px-4 py-1.5 rounded-lg text-xs font-bold text-white border border-zinc-800 min-w-[120px] text-center">
+                    <span id="current-view-month-label" class="bg-zinc-950 px-3 py-1.5 rounded-lg text-xs font-bold text-white border border-zinc-800 min-w-[110px] text-center">
                         กำลังโหลด...
                     </span>
                     <button type="button" onclick="changeMonth(1)" class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
-                        เดือนถัดไป <i class="fa-solid fa-chevron-right"></i>
+                        ถัดไป <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
@@ -412,12 +424,13 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCTrupxObncmjt4Y6zE81Hw_pWFKCR2oKB_PwzAEWHcpGNdnLG2QPd5k-fM62tKoWY/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjAhdFhAD7aPGEpoIiqT8eAhI2gPeOp-4qLnvL5ZpssCMZySquhlk-I5DvWxGeSdRg/exec";
     const SB_URL = "https://ifnmqrlrtqexmthmfsgb.supabase.co/rest/v1/incident_reports";
     const SB_KEY = "sb_publishable_zEP8YY74Ygvhji-giNBcsA_gRv3kjJ4";
     
     let globalAllSheetsData = {}; 
     let currentMonthOffset = 0;
+    let currentTeam = "2"; // ค่าเริ่มต้นชุดปฏิบัติการ
     let pendingData = null;
 
     function getThaiDate() {
@@ -446,9 +459,16 @@
         }
     }
 
+    function changeTeam(teamValue) {
+        currentTeam = teamValue;
+        renderMonthlySchedule();
+    }
+
     function renderMonthlySchedule() {
         const labelEl = document.getElementById('current-view-month-label');
         const containerEl = document.getElementById('sheet-data-container');
+        const teamSelect = document.getElementById('current-team-select');
+        if (teamSelect) currentTeam = teamSelect.value;
         
         if (currentMonthOffset < -1) currentMonthOffset = -1;
         if (currentMonthOffset > 1) currentMonthOffset = 1;
@@ -461,20 +481,32 @@
         else if (currentMonthIdx > 11) { currentMonthIdx = 0; currentYear++; }
         
         const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-        const fullSheetName = thaiMonths[currentMonthIdx] + " " + (currentYear + 543);
+        const monthName = thaiMonths[currentMonthIdx];
+        const fullYearNum = currentYear + 543;
         
-        if (labelEl) labelEl.innerText = fullSheetName;
+        if (labelEl) labelEl.innerText = `${monthName} ${fullYearNum}`;
 
         if (containerEl) {
             if (!globalAllSheetsData || Object.keys(globalAllSheetsData).length === 0) {
                 containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังดาวน์โหลดข้อมูลตารางจากฐานข้อมูลหลัก...</div>`;
                 return;
             }
-            let targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '') === fullSheetName.replace(/\s+/g, ''));
+
+            // ค้นหาชีตที่ตรงกับเดือน ปี และชุดปฏิบัติการ (เช่น "พฤศจิกายน 2569 ชุด 4")
+            let targetKey = Object.keys(globalAllSheetsData).find(name => {
+                let n = name.replace(/\s+/g, '');
+                return n.includes(monthName) && n.includes(fullYearNum.toString()) && (n.includes(`ชุด${currentTeam}`) || n.includes(`ชุดที่${currentTeam}`));
+            });
+
+            // กรณีสำรอง หากยังไม่ได้ตั้งชื่อแท็บแยกชุด ให้ดึงแท็บตามเดือนก่อน
+            if (!targetKey) {
+                targetKey = Object.keys(globalAllSheetsData).find(name => name.replace(/\s+/g, '').includes(monthName));
+            }
+
             if (targetKey && globalAllSheetsData[targetKey]) {
                 displaySheetTable(globalAllSheetsData[targetKey]);
             } else {
-                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวรของแท็บ "${fullSheetName}"</div>`;
+                containerEl.innerHTML = `<div class="text-center py-8 text-zinc-500"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>ไม่พบข้อมูลตารางเวร ชุดที่ ${currentTeam} ประจำเดือน ${monthName} ${fullYearNum}</div>`;
             }
         }
     }
